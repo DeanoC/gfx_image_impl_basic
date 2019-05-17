@@ -1,6 +1,8 @@
 #pragma once
-#ifndef GFX_IMAGEIO_DDS_HPP
-#define GFX_IMAGEIO_DDS_HPP
+#ifndef WYRD_IMAGE_DDS_HPP
+#define WYRD_IMAGE_DDS_HPP
+
+#include "core/core.h"
 
 namespace Image {
 /************************************************************************************/

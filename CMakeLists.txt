@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
-set(LibName gfx_imageio)
+set(BaseInterfaceName gfx_image)
+set(ImplName basic)
+set(LibName ${BaseInterfaceName}_impl_${ImplName})
 project(${LibName})
 
 #if building standalone and not specified build tests
@@ -13,32 +15,28 @@ if(NOT al2o3_POPULATED)
 endif()
 
 set(Interface
-		io.h
 		)
-
 set(Src
+		block.c
+		convert.cpp
+		create.cpp
 		dds.hpp
-		loader.cpp
-		saver.cpp
+		fetch.hpp
+		hq_resample.hpp
+		image.cpp
+		put.hpp
+		utils.cpp
 		)
 
 set(Deps
-		al2o3_platform
-		al2o3_cmath
-		al2o3_stb
-		al2o3_vfile
-		al2o3_syoyo
-		gfx_imageformat
 		gfx_image_interface
-		utils_misccpp
 		)
-ADD_LIB(${LibName} "${Interface}" "${Src}" "${Deps}")
-
+ADD_LINK_TIME_IMPL(${BaseInterfaceName} ${ImplName} "${Interface}" "${Src}" "${Deps}")
 set( Tests
 		runner.cpp
-		test_imageio.cpp
+		test_image.cpp
+		test_pixel.cpp
 		)
 set( TestDeps
-		gfx_image_impl_basic
 		al2o3_catch2 )
-ADD_LIB_TESTS(${LibName} "${Interface}" "${Tests}" "${TestDeps}")
+ADD_LIB_TESTS(${BaseInterfaceName}_impl_${ImplName} "${Interface}" "${Tests}" "${TestDeps}")
