@@ -30,6 +30,7 @@ set(Src
 
 set(Deps
 		gfx_image_interface
+		al2o3_memory
 		)
 ADD_LINK_TIME_IMPL(${BaseInterfaceName} ${ImplName} "${Interface}" "${Src}" "${Deps}")
 set( Tests

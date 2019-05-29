@@ -2,6 +2,7 @@
 #include "gfx_imageformat/format.h"
 #include "gfx_imageformat/formatcracker.h"
 #include "gfx_image/image.h"
+#include "al2o3_memory/memory.h"
 
 AL2O3_EXTERN_C Image_ImageHeader *Image_Create(uint32_t width,
                                          uint32_t height,
@@ -32,7 +33,7 @@ AL2O3_EXTERN_C Image_ImageHeader *Image_CreateNoClear(uint32_t width,
                             slices *
                             ImageFormat_BitWidth(format)) / 8;
 
-  auto *image = (Image_ImageHeader *) malloc(sizeof(Image_ImageHeader) + dataSize);
+  auto *image = (Image_ImageHeader *) MEMORY_MALLOC(sizeof(Image_ImageHeader) + dataSize);
   if (!image) { return image; }
   Image_FillHeader(width, height, depth, slices, format, image);
   image->dataSize = dataSize;
@@ -69,7 +70,7 @@ AL2O3_EXTERN_C void Image_Destroy(Image_ImageHeader *image) {
     default:
     case Image_IT_None:break;
   }
-  free(image);
+  MEMORY_FREE(image);
 }
 
 // we include fetch after swizzle so hopefully the compiler will inline it...
