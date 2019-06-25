@@ -126,15 +126,16 @@ AL2O3_EXTERN_C size_t Image_LinkedImageCountOf(Image_ImageHeader const *image) {
 
 AL2O3_EXTERN_C Image_ImageHeader const *Image_LinkedImageOf(Image_ImageHeader const *image, size_t const index) {
   size_t count = 0;
-  while (image && image->nextImage != nullptr) {
+
+  do {
     if (count == index) {
       return image;
     }
     count++;
     image = image->nextImage;
-  }
+  }  while (image);
 
-  return nullptr;
+return nullptr;
 }
 
 AL2O3_EXTERN_C void Image_SetChannelAt(Image_ImageHeader const *image,
