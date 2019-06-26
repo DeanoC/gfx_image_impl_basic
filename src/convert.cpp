@@ -14,32 +14,34 @@ constexpr size_t ImageFormatCount() {
   return count;
 }
 
-typedef void (*ImageConvertFunc)(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHeader *dst);
-typedef bool (*ImageConvertOutOfPlaceFunc)(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHeader **dst);
+typedef void (*ImageConvertFunc)(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const*dst);
+typedef bool (*ImageConvertOutOfPlaceFunc)(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const**dst);
 
 #define DefineOutOfPlaceConvert(x) \
-bool x##OutOfPlace(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHeader **dst) {\
+bool x##OutOfPlace(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const**dst) {\
   *dst = Image_CloneStructure(src); \
   if (!*dst) { return false; } \
   x(src, newFormat, *dst); \
   return true; \
 }
 
-void SlowImageConvert(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHeader *dst) {
+void SlowImageConvert(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const*dst) {
   ASSERT(newFormat == dst->format);
-  Image_CopyImage(dst, src);
+  Image_CopyImage(src, dst);
 }
 
-bool SlowImageConvertOutOfPlace(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHeader **dst) {
+bool SlowImageConvertOutOfPlace(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const**dst) {
   *dst = Image_PreciseConvert(src, newFormat);
   return (*dst != nullptr);
 }
 
-void R8G8B8ToR8B8G8A8(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHeader *dst) {
+void R8G8B8ToR8B8G8A8(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const * dest) {
   do {
     ASSERT(ImageFormat_ChannelCount(src->format) == 3);
     ASSERT(ImageFormat_ChannelCount(newFormat) == 4);
 
+    // this const cast smells wrong but needed because of inplace
+    auto dst = (Image_ImageHeader*)dest;
     dst->format = newFormat;
 
     // Fast path for RGB->RGBA8
@@ -57,7 +59,7 @@ void R8G8B8ToR8B8G8A8(Image_ImageHeader *src, ImageFormat newFormat, Image_Image
 
     if (src->nextType != Image_IT_None) {
       src = src->nextImage;
-      dst = dst->nextImage;
+      dst = (Image_ImageHeader*)dst->nextImage;
       dst->nextType = src->nextType;
     }
   } while (src->nextType != Image_IT_None);
@@ -65,11 +67,13 @@ void R8G8B8ToR8B8G8A8(Image_ImageHeader *src, ImageFormat newFormat, Image_Image
 }
 DefineOutOfPlaceConvert(R8G8B8ToR8B8G8A8)
 
-void R8G8B8A8ToB8G8R8A8(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHeader *dst) {
+void R8G8B8A8ToB8G8R8A8(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const * dest) {
   do {
     ASSERT(ImageFormat_ChannelCount(src->format) == 4);
     ASSERT(ImageFormat_ChannelCount(newFormat) == 4);
 
+		// this const cast smells wrong but needed because of inplace
+		auto dst = (Image_ImageHeader*)dest;
     dst->format = newFormat;
 
     // Fast path for RGBA8->BGRA8 (just swizzle)
@@ -91,7 +95,7 @@ void R8G8B8A8ToB8G8R8A8(Image_ImageHeader *src, ImageFormat newFormat, Image_Ima
 
     if (src->nextType != Image_IT_None) {
       src = src->nextImage;
-      dst = dst->nextImage;
+      dst = (Image_ImageHeader*)dst->nextImage;
       dst->nextType = src->nextType;
     }
   } while (src->nextType != Image_IT_None);
@@ -99,9 +103,10 @@ void R8G8B8A8ToB8G8R8A8(Image_ImageHeader *src, ImageFormat newFormat, Image_Ima
 }
 DefineOutOfPlaceConvert(R8G8B8A8ToB8G8R8A8)
 
-void HalfNToFloatN(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHeader *dst) {
+void HalfNToFloatN(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const*dest) {
   do {
     // Fast path for half->float
+		auto dst = (Image_ImageHeader*)dest;
     uint16_t const *sdata = (uint16_t *) Image_RawDataPtr(src);
     float *ddata = (float *) Image_RawDataPtr(dst);
     size_t nPixels = Image_PixelCountOf(src);
@@ -126,7 +131,7 @@ void HalfNToFloatN(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHea
 
     if (src->nextType != Image_IT_None) {
       src = src->nextImage;
-      dst = dst->nextImage;
+      dst = (Image_ImageHeader*)dst->nextImage;
       dst->nextType = src->nextType;
     }
   } while (src->nextType != Image_IT_None);
@@ -134,10 +139,11 @@ void HalfNToFloatN(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHea
 }
 DefineOutOfPlaceConvert(HalfNToFloatN)
 
-void FloatNToHalfN(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHeader *dst) {
+void FloatNToHalfN(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const*dest) {
   do {
     // Fast path for float->half
-    float const *sdata = (float const *) Image_RawDataPtr(src);
+		auto dst = (Image_ImageHeader*)dest;
+		float const *sdata = (float const *) Image_RawDataPtr(src);
     uint16_t *ddata = (uint16_t *) Image_RawDataPtr(dst);
     size_t nPixels = Image_PixelCountOf(src);
     do {
@@ -160,7 +166,7 @@ void FloatNToHalfN(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHea
 
     if (src->nextType != Image_IT_None) {
       src = src->nextImage;
-      dst = dst->nextImage;
+      dst = (Image_ImageHeader*)dst->nextImage;
       dst->nextType = src->nextType;
     }
   } while (src->nextType != Image_IT_None);
@@ -168,8 +174,9 @@ void FloatNToHalfN(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHea
 DefineOutOfPlaceConvert(FloatNToHalfN)
 
 #define IntegerTypeNToFloatN(t, n1, n2) \
-void t##ToFloat_##n1##_##n2(Image_ImageHeader *src, ImageFormat newFormat, Image_ImageHeader *dst) { \
+void t##ToFloat_##n1##_##n2(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const * dest) { \
   do { \
+  	auto dst = (Image_ImageHeader*)dest;\
     t const *sdata = (t*) Image_RawDataPtr(src); \
     float* ddata = (float*) Image_RawDataPtr(dst); \
     size_t nPixels = Image_PixelCountOf(src); \
@@ -190,7 +197,7 @@ void t##ToFloat_##n1##_##n2(Image_ImageHeader *src, ImageFormat newFormat, Image
     while (--nPixels); \
     if(src->nextType != Image_IT_None) { \
       src = src->nextImage; \
-      dst = dst->nextImage; \
+      dst = (Image_ImageHeader*)dst->nextImage; \
       dst->nextType = src->nextType; \
     } \
   } while(src->nextType != Image_IT_None); \
@@ -345,7 +352,7 @@ destSize;
 
 } // end anon namespace
 
-AL2O3_EXTERN_C Image_ImageHeader *Image_FastConvert(Image_ImageHeader *src, ImageFormat const newFormat, bool allowInPlace) {
+AL2O3_EXTERN_C Image_ImageHeader const * Image_FastConvert(Image_ImageHeader const * src, ImageFormat const newFormat, bool allowInPlace) {
   ASSERT(src);
 
   if (allowInPlace && src->format == newFormat) {
@@ -360,7 +367,7 @@ AL2O3_EXTERN_C Image_ImageHeader *Image_FastConvert(Image_ImageHeader *src, Imag
     g_imageConvertDDTable[src->format][newFormat](src, newFormat, src);
     return src;
   } else {
-    Image_ImageHeader *dst;
+    Image_ImageHeader const *dst;
     bool ret = g_imageConvertOutOfPlaceDDTable[src->format][newFormat](src, newFormat, &dst);
     if (ret) { return dst; }
     else { return nullptr; }

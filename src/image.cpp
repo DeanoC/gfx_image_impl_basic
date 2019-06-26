@@ -4,20 +4,20 @@
 #include "gfx_image/image.h"
 #include "al2o3_memory/memory.h"
 
-AL2O3_EXTERN_C Image_ImageHeader *Image_Create(uint32_t width,
+AL2O3_EXTERN_C Image_ImageHeader const *Image_Create(uint32_t width,
                                          uint32_t height,
                                          uint32_t depth,
                                          uint32_t slices,
                                          enum ImageFormat format) {
-  Image_ImageHeader *image = Image_CreateNoClear(width, height, depth, slices, format);
+  auto image = Image_CreateNoClear(width, height, depth, slices, format);
   if (image) {
-    memset(image + 1, 0, image->dataSize);
+    memset(Image_RawDataPtr(image), 0, image->dataSize);
   }
 
   return image;
 }
 
-AL2O3_EXTERN_C Image_ImageHeader *Image_CreateNoClear(uint32_t width,
+AL2O3_EXTERN_C Image_ImageHeader const *Image_CreateNoClear(uint32_t width,
                                                 uint32_t height,
                                                 uint32_t depth,
                                                 uint32_t slices,
@@ -57,7 +57,7 @@ AL2O3_EXTERN_C void Image_FillHeader(uint32_t width,
   header->nextImage = nullptr;
 }
 
-AL2O3_EXTERN_C void Image_Destroy(Image_ImageHeader *image) {
+AL2O3_EXTERN_C void Image_Destroy(Image_ImageHeader const *image) {
   // recursively free next chain
   switch (image->nextType) {
     case Image_IT_MipMaps:
@@ -70,7 +70,7 @@ AL2O3_EXTERN_C void Image_Destroy(Image_ImageHeader *image) {
     default:
     case Image_IT_None:break;
   }
-  MEMORY_FREE(image);
+  MEMORY_FREE((Image_ImageHeader*)image);
 }
 
 // we include fetch after swizzle so hopefully the compiler will inline it...
