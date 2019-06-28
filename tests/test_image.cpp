@@ -5,7 +5,7 @@
 #include "al2o3_catch2/catch2.hpp"
 
 TEST_CASE("Image create/destroy 1D (C)", "[Image]") {
-  Image_ImageHeader *image0 = Image_Create1D(256, ImageFormat_A8B8G8R8_UNORM_PACK32);
+  Image_ImageHeader const *image0 = Image_Create1D(256, ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image0);
   REQUIRE(image0->format == ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image0->width == 256);
@@ -18,7 +18,7 @@ TEST_CASE("Image create/destroy 1D (C)", "[Image]") {
   REQUIRE(image0->flags == 0);
   Image_Destroy(image0);
 
-  Image_ImageHeader *image1 = Image_Create1DNoClear(64, ImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image1 = Image_Create1DNoClear(64, ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image1);
   REQUIRE(image1->format == ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image1->width == 64);
@@ -31,7 +31,7 @@ TEST_CASE("Image create/destroy 1D (C)", "[Image]") {
   REQUIRE(image1->flags == 0);
   Image_Destroy(image1);
 
-  Image_ImageHeader *image2 = Image_Create1DArray(256, 20, ImageFormat_A8B8G8R8_UNORM_PACK32);
+  Image_ImageHeader const *image2 = Image_Create1DArray(256, 20, ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image2);
   REQUIRE(image2->format == ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image2->width == 256);
@@ -44,7 +44,7 @@ TEST_CASE("Image create/destroy 1D (C)", "[Image]") {
   REQUIRE(image2->flags == 0);
   Image_Destroy(image2);
 
-  Image_ImageHeader *image3 = Image_Create1DArrayNoClear(64, 100, ImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image3 = Image_Create1DArrayNoClear(64, 100, ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image3);
   REQUIRE(image3->format == ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image3->width == 64);
@@ -60,7 +60,7 @@ TEST_CASE("Image create/destroy 1D (C)", "[Image]") {
 }
 
 TEST_CASE("Image create/destroy 2D (C)", "[Image]") {
-  Image_ImageHeader *image0 = Image_Create2D(256, 256, ImageFormat_A8B8G8R8_UNORM_PACK32);
+  Image_ImageHeader const *image0 = Image_Create2D(256, 256, ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image0);
   REQUIRE(image0->format == ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image0->width == 256);
@@ -73,7 +73,7 @@ TEST_CASE("Image create/destroy 2D (C)", "[Image]") {
   REQUIRE(image0->flags == 0);
   Image_Destroy(image0);
 
-  Image_ImageHeader *image1 = Image_Create2DNoClear(64, 128, ImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image1 = Image_Create2DNoClear(64, 128, ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image1);
   REQUIRE(image1->format == ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image1->width == 64);
@@ -86,7 +86,7 @@ TEST_CASE("Image create/destroy 2D (C)", "[Image]") {
   REQUIRE(image1->flags == 0);
   Image_Destroy(image1);
 
-  Image_ImageHeader *image2 = Image_Create2DArray(256, 256, 20, ImageFormat_A8B8G8R8_UNORM_PACK32);
+  Image_ImageHeader const *image2 = Image_Create2DArray(256, 256, 20, ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image2);
   REQUIRE(image2->format == ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image2->width == 256);
@@ -99,7 +99,7 @@ TEST_CASE("Image create/destroy 2D (C)", "[Image]") {
   REQUIRE(image2->flags == 0);
   Image_Destroy(image2);
 
-  Image_ImageHeader *image3 = Image_Create2DArrayNoClear(64, 32, 100, ImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image3 = Image_Create2DArrayNoClear(64, 32, 100, ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image3);
   REQUIRE(image3->format == ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image3->width == 64);
@@ -114,7 +114,7 @@ TEST_CASE("Image create/destroy 2D (C)", "[Image]") {
 }
 
 TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
-  Image_ImageHeader *image0 = Image_Create3D(256, 256, 16, ImageFormat_A8B8G8R8_UNORM_PACK32);
+  Image_ImageHeader const *image0 = Image_Create3D(256, 256, 16, ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image0);
   REQUIRE(image0->format == ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image0->width == 256);
@@ -127,7 +127,7 @@ TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
   REQUIRE(image0->flags == 0);
   Image_Destroy(image0);
 
-  Image_ImageHeader *image1 = Image_Create3DNoClear(64, 128, 256, ImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image1 = Image_Create3DNoClear(64, 128, 256, ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image1);
   REQUIRE(image1->format == ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image1->width == 64);
@@ -140,7 +140,7 @@ TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
   REQUIRE(image1->flags == 0);
   Image_Destroy(image1);
 
-  Image_ImageHeader *image2 = Image_Create3DArray(256, 256, 256, 20, ImageFormat_A8B8G8R8_UNORM_PACK32);
+  Image_ImageHeader const *image2 = Image_Create3DArray(256, 256, 256, 20, ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image2);
   REQUIRE(image2->format == ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image2->width == 256);
@@ -153,7 +153,7 @@ TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
   REQUIRE(image2->flags == 0);
   Image_Destroy(image2);
 
-  Image_ImageHeader *image3 = Image_Create3DArrayNoClear(64, 32, 16, 100, ImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image3 = Image_Create3DArrayNoClear(64, 32, 16, 100, ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image3);
   REQUIRE(image3->format == ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image3->width == 64);
@@ -167,7 +167,7 @@ TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
   Image_Destroy(image3);
 
   // HUGE test
-  Image_ImageHeader *image4 = Image_Create3DArrayNoClear(1024, 1024, 16, 10, ImageFormat_R64G64B64A64_SFLOAT);
+  Image_ImageHeader const *image4 = Image_Create3DArrayNoClear(1024, 1024, 16, 10, ImageFormat_R64G64B64A64_SFLOAT);
   REQUIRE(image4);
   REQUIRE(image4->format == ImageFormat_R64G64B64A64_SFLOAT);
   REQUIRE(image4->width == 1024);
@@ -182,7 +182,7 @@ TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
 }
 
 TEST_CASE("Image create/destroy 2D Cubemap (C)", "[Image]") {
-  Image_ImageHeader *image0 = Image_CreateCubemap(256, 256, ImageFormat_A8B8G8R8_UNORM_PACK32);
+  Image_ImageHeader const *image0 = Image_CreateCubemap(256, 256, ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image0);
   REQUIRE(image0->format == ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image0->width == 256);
@@ -195,7 +195,7 @@ TEST_CASE("Image create/destroy 2D Cubemap (C)", "[Image]") {
   REQUIRE(image0->flags == Image_Flag_Cubemap);
   Image_Destroy(image0);
 
-  Image_ImageHeader *image1 = Image_CreateCubemapNoClear(64, 128, ImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image1 = Image_CreateCubemapNoClear(64, 128, ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image1);
   REQUIRE(image1->format == ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image1->width == 64);
@@ -208,7 +208,7 @@ TEST_CASE("Image create/destroy 2D Cubemap (C)", "[Image]") {
   REQUIRE(image1->flags == Image_Flag_Cubemap);
   Image_Destroy(image1);
 
-  Image_ImageHeader *image2 = Image_CreateCubemapArray(256, 256, 20, ImageFormat_A8B8G8R8_UNORM_PACK32);
+  Image_ImageHeader const *image2 = Image_CreateCubemapArray(256, 256, 20, ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image2);
   REQUIRE(image2->format == ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image2->width == 256);
@@ -221,7 +221,7 @@ TEST_CASE("Image create/destroy 2D Cubemap (C)", "[Image]") {
   REQUIRE(image2->flags == Image_Flag_Cubemap);
   Image_Destroy(image2);
 
-  Image_ImageHeader *image3 = Image_CreateCubemapArrayNoClear(64, 32, 100, ImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image3 = Image_CreateCubemapArrayNoClear(64, 32, 100, ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image3);
   REQUIRE(image3->format == ImageFormat_R5G5B5A1_UNORM_PACK16);
   REQUIRE(image3->width == 64);
@@ -236,7 +236,7 @@ TEST_CASE("Image create/destroy 2D Cubemap (C)", "[Image]") {
 }
 
 TEST_CASE("Calculate Index (C)", "[Image]") {
-  Image_ImageHeader *image = Image_Create3DArray(17, 17, 17, 17, ImageFormat_A8B8G8R8_UNORM_PACK32);
+  Image_ImageHeader const *image = Image_Create3DArray(17, 17, 17, 17, ImageFormat_A8B8G8R8_UNORM_PACK32);
   REQUIRE(image);
   uint64_t const pixelSize = ImageFormat_BitWidth(image->format);
   REQUIRE(image->dataSize == (17 * 17 * 17 * 17 * pixelSize) / 8);

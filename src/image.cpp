@@ -27,6 +27,10 @@ AL2O3_EXTERN_C Image_ImageHeader const *Image_CreateNoClear(uint32_t width,
     return nullptr;
   }
 
+  if(height == 0) height = 1;
+  if(depth == 0) depth = 1;
+  if(slices == 0) slices = 1;
+
   uint64_t const dataSize = (width *
                             height *
                             depth *
