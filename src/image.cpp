@@ -188,6 +188,8 @@ AL2O3_EXTERN_C void Image_GetPixelAt(Image_ImageHeader const *image, Image_Pixel
   ASSERT(image);
   ASSERT(pixel);
 
+  memset(pixel, 0, sizeof(Image_PixelD));
+
   // intentional fallthrough on this switch statement
   switch (ImageFormat_ChannelCount(image->format)) {
     case 4:pixel->a = Image_GetChannelAt(image, Image_Alpha, index);
