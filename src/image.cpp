@@ -22,20 +22,22 @@ AL2O3_EXTERN_C Image_ImageHeader const *Image_CreateNoClear(uint32_t width,
                                                 uint32_t depth,
                                                 uint32_t slices,
                                                 enum ImageFormat format) {
-  // block compression can't be less than 4x4
-  if ((width < 4 || height < 4) && ImageFormat_IsCompressed(format)) {
-    return nullptr;
+	// smallest sized a block compressed texture can have is hte block size
+  if(ImageFormat_IsCompressed(format)) {
+  	if(width < ImageFormat_WidthOfBlock(format)) width = ImageFormat_WidthOfBlock(format);
+  	if(height < ImageFormat_HeightOfBlock(format)) height = ImageFormat_HeightOfBlock(format);
   }
 
   if(height == 0) height = 1;
   if(depth == 0) depth = 1;
   if(slices == 0) slices = 1;
 
-  uint64_t const dataSize = (width *
-                            height *
-                            depth *
-                            slices *
-                            ImageFormat_BitWidth(format)) / 8;
+  uint64_t const pixelCount = width * height * depth * slices;
+
+  uint64_t const dataSize = ImageFormat_IsCompressed(format) ?
+														(	(pixelCount * ImageFormat_BitSizeOfBlock(format)) /
+															(ImageFormat_PixelCountOfBlock(format) * 8) ) :
+														( (pixelCount * ImageFormat_BitWidth(format)) / 8);
 
   auto *image = (Image_ImageHeader *) MEMORY_MALLOC(sizeof(Image_ImageHeader) + dataSize);
   if (!image) { return image; }
