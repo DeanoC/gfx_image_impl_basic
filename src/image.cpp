@@ -22,27 +22,18 @@ AL2O3_EXTERN_C Image_ImageHeader const *Image_CreateNoClear(uint32_t width,
                                                 uint32_t depth,
                                                 uint32_t slices,
                                                 enum ImageFormat format) {
-	// smallest sized a block compressed texture can have is hte block size
-  if(ImageFormat_IsCompressed(format)) {
-  	if(width < ImageFormat_WidthOfBlock(format)) width = ImageFormat_WidthOfBlock(format);
-  	if(height < ImageFormat_HeightOfBlock(format)) height = ImageFormat_HeightOfBlock(format);
-  }
-
+	if(width == 0)return nullptr;
   if(height == 0) height = 1;
   if(depth == 0) depth = 1;
   if(slices == 0) slices = 1;
 
-  uint64_t const pixelCount = width * height * depth * slices;
+	Image_ImageHeader tmp;
+	Image_FillHeader(width, height, depth, slices, format, &tmp);
 
-  uint64_t const dataSize = ImageFormat_IsCompressed(format) ?
-														(	(pixelCount * ImageFormat_BitSizeOfBlock(format)) /
-															(ImageFormat_PixelCountOfBlock(format) * 8) ) :
-														( (pixelCount * ImageFormat_BitWidth(format)) / 8);
+  auto *image = (Image_ImageHeader *) MEMORY_MALLOC(sizeof(Image_ImageHeader) + tmp.dataSize);
+  if (!image) { return nullptr; }
 
-  auto *image = (Image_ImageHeader *) MEMORY_MALLOC(sizeof(Image_ImageHeader) + dataSize);
-  if (!image) { return image; }
-  Image_FillHeader(width, height, depth, slices, format, image);
-  image->dataSize = dataSize;
+  memcpy(image, &tmp, sizeof(Image_ImageHeader));
 
   return image;
 }
@@ -52,29 +43,49 @@ AL2O3_EXTERN_C void Image_FillHeader(uint32_t width,
                                uint32_t slices,
                                enum ImageFormat format,
                                Image_ImageHeader *header) {
-  header->dataSize = 0;
+
+	uint64_t const pixelCount = width * height * depth * slices;
+
+  if(ImageFormat_IsCompressed(format)) {
+  	size_t const blockW = ImageFormat_WidthOfBlock(format);
+		size_t const blockH = ImageFormat_HeightOfBlock(format);
+
+		// smallest sized a block compressed texture can have is hte block size
+		width = Math_MaxU32(width, blockW);
+		height = Math_MaxU32(height, blockH);
+
+		// round up to block size
+  	width = (width + (blockW-1)) & ~(blockW-1);
+		height = (height + (blockH-1)) & ~(blockH-1);
+
+		uint32_t blockBitSize = ImageFormat_BitSizeOfBlock(format);
+		header->dataSize = (pixelCount * blockBitSize) / (blockW * blockH * 8);
+	} else {
+		header->dataSize = (pixelCount * ImageFormat_BitWidth(format)) / 8;
+  }
+
   header->width = width;
-  header->height = height;
+	header->height = height;
   header->depth = depth;
   header->slices = slices;
   header->format = format;
   header->flags = 0;
-  header->nextType = Image_IT_None;
+  header->nextType = Image_NT_None;
   header->nextImage = nullptr;
 }
 
 AL2O3_EXTERN_C void Image_Destroy(Image_ImageHeader const *image) {
   // recursively free next chain
   switch (image->nextType) {
-    case Image_IT_MipMaps:
-    case IMAGE_IT_Layers: {
+    case Image_NT_MipMaps:
+    case Image_NT_Layers: {
       if (image->nextImage != nullptr) {
         Image_Destroy(image->nextImage);
       }
     }
       break;
     default:
-    case Image_IT_None:break;
+    case Image_NT_None:break;
   }
   MEMORY_FREE((Image_ImageHeader*)image);
 }

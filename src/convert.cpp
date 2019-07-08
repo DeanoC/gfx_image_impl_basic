@@ -56,15 +56,15 @@ void R8G8B8ToR8B8G8A8(Image_ImageHeader const*src, ImageFormat newFormat, Image_
       ddata += 4;
     } while (--nPixels);
 
-		if (src->nextType != Image_IT_None) {
+		if (src->nextType != Image_NT_None) {
 			dst->nextType = src->nextType;
 			src = src->nextImage;
 			dst = (Image_ImageHeader*)dst->nextImage;
 		} else {
-			if(dst->nextType != Image_IT_None) Image_Destroy(dst->nextImage);
-			dst->nextType = Image_IT_None;
+			if(dst->nextType != Image_NT_None) Image_Destroy(dst->nextImage);
+			dst->nextType = Image_NT_None;
 		}
-  } while (src->nextType != Image_IT_None);
+  } while (src->nextType != Image_NT_None);
 
 }
 DefineOutOfPlaceConvert(R8G8B8ToR8B8G8A8)
@@ -94,15 +94,15 @@ void R8G8B8A8ToB8G8R8A8(Image_ImageHeader const*src, ImageFormat newFormat, Imag
       ddata += 4;
     } while (--nPixels);
 
-		if (src->nextType != Image_IT_None) {
+		if (src->nextType != Image_NT_None) {
 			dst->nextType = src->nextType;
 			src = src->nextImage;
 			dst = (Image_ImageHeader*)dst->nextImage;
 		} else {
-			if(dst->nextType != Image_IT_None) Image_Destroy(dst->nextImage);
-			dst->nextType = Image_IT_None;
+			if(dst->nextType != Image_NT_None) Image_Destroy(dst->nextImage);
+			dst->nextType = Image_NT_None;
 		}
-  } while (src->nextType != Image_IT_None);
+  } while (src->nextType != Image_NT_None);
 
 }
 DefineOutOfPlaceConvert(R8G8B8A8ToB8G8R8A8)
@@ -133,15 +133,15 @@ void HalfNToFloatN(Image_ImageHeader const*src, ImageFormat newFormat, Image_Ima
       ddata += sizeof(float) * ImageFormat_ChannelCount(newFormat);
     } while (--nPixels);
 
-		if (src->nextType != Image_IT_None) {
+		if (src->nextType != Image_NT_None) {
 			dst->nextType = src->nextType;
 			src = src->nextImage;
 			dst = (Image_ImageHeader*)dst->nextImage;
 		} else {
-			if(dst->nextType != Image_IT_None) Image_Destroy(dst->nextImage);
-			dst->nextType = Image_IT_None;
+			if(dst->nextType != Image_NT_None) Image_Destroy(dst->nextImage);
+			dst->nextType = Image_NT_None;
 		}
-  } while (src->nextType != Image_IT_None);
+  } while (src->nextType != Image_NT_None);
 
 }
 DefineOutOfPlaceConvert(HalfNToFloatN)
@@ -171,15 +171,15 @@ void FloatNToHalfN(Image_ImageHeader const*src, ImageFormat newFormat, Image_Ima
       ddata += sizeof(float) * ImageFormat_ChannelCount(newFormat);
     } while (--nPixels);
 
-    if (src->nextType != Image_IT_None) {
+    if (src->nextType != Image_NT_None) {
 			dst->nextType = src->nextType;
       src = src->nextImage;
       dst = (Image_ImageHeader*)dst->nextImage;
     } else {
-    	if(dst->nextType != Image_IT_None) Image_Destroy(dst->nextImage);
-			dst->nextType = Image_IT_None;
+    	if(dst->nextType != Image_NT_None) Image_Destroy(dst->nextImage);
+			dst->nextType = Image_NT_None;
 		}
-  } while (src->nextType != Image_IT_None);
+  } while (src->nextType != Image_NT_None);
 }
 DefineOutOfPlaceConvert(FloatNToHalfN)
 
@@ -205,15 +205,15 @@ void t##ToFloat_##n1##_##n2(Image_ImageHeader const*src, ImageFormat newFormat, 
       ddata += sizeof(float) * n2; \
     } \
     while (--nPixels); \
-		if (src->nextType != Image_IT_None) { \
+		if (src->nextType != Image_NT_None) { \
 			dst->nextType = src->nextType; \
 			src = src->nextImage; \
 			dst = (Image_ImageHeader*)dst->nextImage; \
 		} else { \
-			if(dst->nextType != Image_IT_None) Image_Destroy(dst->nextImage); \
-			dst->nextType = Image_IT_None; \
+			if(dst->nextType != Image_NT_None) Image_Destroy(dst->nextImage); \
+			dst->nextType = Image_NT_None; \
 		} \
-	} while (src->nextType != Image_IT_None);\
+	} while (src->nextType != Image_NT_None);\
 } \
 DefineOutOfPlaceConvert(t##ToFloat_##n1##_##n2)
 

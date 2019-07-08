@@ -152,7 +152,7 @@ AL2O3_EXTERN_C bool Image_NormalizeAcrossChannels(Image_ImageHeader const *src) 
 // TODO optimise or have option for faster mipmap chain generation
 AL2O3_EXTERN_C void Image_CreateMipMapChain(Image_ImageHeader const * image, bool generateFromImage) {
 	// start from the image provided and create successive mip images
-	ASSERT(image->nextType == Image_IT_None);
+	ASSERT(image->nextType == Image_NT_None);
 	ASSERT(Math_IsPowerOf2U32(image->width));
 	ASSERT(Math_IsPowerOf2U32(image->height));
 
@@ -212,7 +212,7 @@ AL2O3_EXTERN_C void Image_CreateMipMapChain(Image_ImageHeader const * image, boo
 		}
 
 		curImage->nextImage = (Image_ImageHeader*)newImage;
-		curImage->nextType = Image_IT_MipMaps;
+		curImage->nextType = Image_NT_MipMaps;
 		curImage = (Image_ImageHeader*)curImage->nextImage;
 	} while (curWidth > 1 || curHeight > 1);
 
@@ -334,7 +334,7 @@ AL2O3_EXTERN_C Image_ImageHeader const * Image_Clone(Image_ImageHeader const *im
 		return nullptr;
 	}
 	Image_CopyImage(image, dst);
-	if (image->nextType != Image_IT_None) {
+	if (image->nextType != Image_NT_None) {
 		dst->nextImage = Image_Clone(image->nextImage);
 		dst->nextType = image->nextType;
 	}
@@ -346,7 +346,7 @@ AL2O3_EXTERN_C Image_ImageHeader const * Image_CloneStructure(Image_ImageHeader 
 	if (dst == nullptr) {
 		return nullptr;
 	}
-	if (image->nextType != Image_IT_None) {
+	if (image->nextType != Image_NT_None) {
 		dst->nextImage = Image_CloneStructure(image->nextImage);
 		dst->nextType = image->nextType;
 	}
@@ -359,7 +359,7 @@ AL2O3_EXTERN_C Image_ImageHeader const * Image_PreciseConvert(Image_ImageHeader 
 		return nullptr;
 	}
 	Image_CopyImage(image, dst);
-	if (image->nextType != Image_IT_None) {
+	if (image->nextType != Image_NT_None) {
 		dst->nextImage = Image_PreciseConvert(image->nextImage, newFormat);
 		dst->nextType = image->nextType;
 	}
