@@ -78,6 +78,7 @@ AL2O3_EXTERN_C Image_ImageHeader const * Image_CreateCubemapArray(uint32_t width
                                                      uint32_t height,
                                                      uint32_t slices,
                                                      enum ImageFormat format) {
+	if(slices == 0) slices = 1;
 	auto image = (Image_ImageHeader*) Image_Create(width, height, 1, slices * 6, format);
   if(image) {
     image->flags = Image_Flag_Cubemap;
@@ -88,6 +89,7 @@ AL2O3_EXTERN_C Image_ImageHeader const*Image_CreateCubemapArrayNoClear(uint32_t 
                                                             uint32_t height,
                                                             uint32_t slices,
                                                             enum ImageFormat format) {
+	if(slices == 0) slices = 1;
   auto image = (Image_ImageHeader*) Image_CreateNoClear(width, height, 1, slices * 6, format);
   if(image) {
     image->flags = Image_Flag_Cubemap;
