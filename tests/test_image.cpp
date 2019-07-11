@@ -14,7 +14,7 @@ TEST_CASE("Image create/destroy 1D (C)", "[Image]") {
   REQUIRE(image0->slices == 1);
   REQUIRE(image0->dataSize == (256 * ImageFormat_BitWidth(image0->format)) / 8);
   REQUIRE(image0->nextImage == nullptr);
-  REQUIRE(image0->nextType == Image_IT_None);
+  REQUIRE(image0->nextType == Image_NT_None);
   REQUIRE(image0->flags == 0);
   Image_Destroy(image0);
 
@@ -27,7 +27,7 @@ TEST_CASE("Image create/destroy 1D (C)", "[Image]") {
   REQUIRE(image1->slices == 1);
   REQUIRE(image1->dataSize == (64 * ImageFormat_BitWidth(image1->format)) / 8);
   REQUIRE(image1->nextImage == nullptr);
-  REQUIRE(image1->nextType == Image_IT_None);
+  REQUIRE(image1->nextType == Image_NT_None);
   REQUIRE(image1->flags == 0);
   Image_Destroy(image1);
 
@@ -40,7 +40,7 @@ TEST_CASE("Image create/destroy 1D (C)", "[Image]") {
   REQUIRE(image2->slices == 20);
   REQUIRE(image2->dataSize == (256 * 20 * ImageFormat_BitWidth(image2->format)) / 8);
   REQUIRE(image2->nextImage == nullptr);
-  REQUIRE(image2->nextType == Image_IT_None);
+  REQUIRE(image2->nextType == Image_NT_None);
   REQUIRE(image2->flags == 0);
   Image_Destroy(image2);
 
@@ -53,7 +53,7 @@ TEST_CASE("Image create/destroy 1D (C)", "[Image]") {
   REQUIRE(image3->slices == 100);
   REQUIRE(image3->dataSize == (64 * 100 * ImageFormat_BitWidth(image3->format)) / 8);
   REQUIRE(image3->nextImage == nullptr);
-  REQUIRE(image3->nextType == Image_IT_None);
+  REQUIRE(image3->nextType == Image_NT_None);
   REQUIRE(image3->flags == 0);
   Image_Destroy(image3);
 
@@ -69,7 +69,7 @@ TEST_CASE("Image create/destroy 2D (C)", "[Image]") {
   REQUIRE(image0->slices == 1);
   REQUIRE(image0->dataSize == (256 * 256 * ImageFormat_BitWidth(image0->format)) / 8);
   REQUIRE(image0->nextImage == nullptr);
-  REQUIRE(image0->nextType == Image_IT_None);
+  REQUIRE(image0->nextType == Image_NT_None);
   REQUIRE(image0->flags == 0);
   Image_Destroy(image0);
 
@@ -82,7 +82,7 @@ TEST_CASE("Image create/destroy 2D (C)", "[Image]") {
   REQUIRE(image1->slices == 1);
   REQUIRE(image1->dataSize == (64 * 128 * ImageFormat_BitWidth(image1->format)) / 8);
   REQUIRE(image1->nextImage == nullptr);
-  REQUIRE(image1->nextType == Image_IT_None);
+  REQUIRE(image1->nextType == Image_NT_None);
   REQUIRE(image1->flags == 0);
   Image_Destroy(image1);
 
@@ -95,7 +95,7 @@ TEST_CASE("Image create/destroy 2D (C)", "[Image]") {
   REQUIRE(image2->slices == 20);
   REQUIRE(image2->dataSize == (256 * 256 * 20 * ImageFormat_BitWidth(image2->format)) / 8);
   REQUIRE(image2->nextImage == nullptr);
-  REQUIRE(image2->nextType == Image_IT_None);
+  REQUIRE(image2->nextType == Image_NT_None);
   REQUIRE(image2->flags == 0);
   Image_Destroy(image2);
 
@@ -108,7 +108,7 @@ TEST_CASE("Image create/destroy 2D (C)", "[Image]") {
   REQUIRE(image3->slices == 100);
   REQUIRE(image3->dataSize == (64 * 32 * 100 * ImageFormat_BitWidth(image3->format)) / 8);
   REQUIRE(image3->nextImage == nullptr);
-  REQUIRE(image3->nextType == Image_IT_None);
+  REQUIRE(image3->nextType == Image_NT_None);
   REQUIRE(image3->flags == 0);
   Image_Destroy(image3);
 }
@@ -123,7 +123,7 @@ TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
   REQUIRE(image0->slices == 1);
   REQUIRE(image0->dataSize == (256 * 256 * 16 * ImageFormat_BitWidth(image0->format)) / 8);
   REQUIRE(image0->nextImage == nullptr);
-  REQUIRE(image0->nextType == Image_IT_None);
+  REQUIRE(image0->nextType == Image_NT_None);
   REQUIRE(image0->flags == 0);
   Image_Destroy(image0);
 
@@ -136,7 +136,7 @@ TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
   REQUIRE(image1->slices == 1);
   REQUIRE(image1->dataSize == (64 * 128 * 256 * ImageFormat_BitWidth(image1->format)) / 8);
   REQUIRE(image1->nextImage == nullptr);
-  REQUIRE(image1->nextType == Image_IT_None);
+  REQUIRE(image1->nextType == Image_NT_None);
   REQUIRE(image1->flags == 0);
   Image_Destroy(image1);
 
@@ -149,7 +149,7 @@ TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
   REQUIRE(image2->slices == 20);
   REQUIRE(image2->dataSize == (256 * 256 * 256 * 20 * ImageFormat_BitWidth(image2->format)) / 8);
   REQUIRE(image2->nextImage == nullptr);
-  REQUIRE(image2->nextType == Image_IT_None);
+  REQUIRE(image2->nextType == Image_NT_None);
   REQUIRE(image2->flags == 0);
   Image_Destroy(image2);
 
@@ -162,7 +162,7 @@ TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
   REQUIRE(image3->slices == 100);
   REQUIRE(image3->dataSize == (64 * 32 * 16 * 100 * ImageFormat_BitWidth(image3->format)) / 8);
   REQUIRE(image3->nextImage == nullptr);
-  REQUIRE(image3->nextType == Image_IT_None);
+  REQUIRE(image3->nextType == Image_NT_None);
   REQUIRE(image3->flags == 0);
   Image_Destroy(image3);
 
@@ -176,7 +176,7 @@ TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
   REQUIRE(image4->slices == 10);
   REQUIRE(image4->dataSize == (1024 * 1024 * 16 * 100 * ImageFormat_BitWidth(image4->format)) / 8);
   REQUIRE(image4->nextImage == nullptr);
-  REQUIRE(image4->nextType == Image_IT_None);
+  REQUIRE(image4->nextType == Image_NT_None);
   REQUIRE(image4->flags == 0);
   Image_Destroy(image4);
 }
@@ -191,7 +191,7 @@ TEST_CASE("Image create/destroy 2D Cubemap (C)", "[Image]") {
   REQUIRE(image0->slices == 6);
   REQUIRE(image0->dataSize == (256 * 256 * 6 * ImageFormat_BitWidth(image0->format)) / 8);
   REQUIRE(image0->nextImage == nullptr);
-  REQUIRE(image0->nextType == Image_IT_None);
+  REQUIRE(image0->nextType == Image_NT_None);
   REQUIRE(image0->flags == Image_Flag_Cubemap);
   Image_Destroy(image0);
 
@@ -204,7 +204,7 @@ TEST_CASE("Image create/destroy 2D Cubemap (C)", "[Image]") {
   REQUIRE(image1->slices == 6);
   REQUIRE(image1->dataSize == (64 * 128 * 6 * ImageFormat_BitWidth(image1->format)) / 8);
   REQUIRE(image1->nextImage == nullptr);
-  REQUIRE(image1->nextType == Image_IT_None);
+  REQUIRE(image1->nextType == Image_NT_None);
   REQUIRE(image1->flags == Image_Flag_Cubemap);
   Image_Destroy(image1);
 
@@ -217,7 +217,7 @@ TEST_CASE("Image create/destroy 2D Cubemap (C)", "[Image]") {
   REQUIRE(image2->slices == 20 * 6);
   REQUIRE(image2->dataSize == (256 * 256 * 20 * 6 * ImageFormat_BitWidth(image2->format)) / 8);
   REQUIRE(image2->nextImage == nullptr);
-  REQUIRE(image2->nextType == Image_IT_None);
+  REQUIRE(image2->nextType == Image_NT_None);
   REQUIRE(image2->flags == Image_Flag_Cubemap);
   Image_Destroy(image2);
 
@@ -230,7 +230,7 @@ TEST_CASE("Image create/destroy 2D Cubemap (C)", "[Image]") {
   REQUIRE(image3->slices == 100 * 6);
   REQUIRE(image3->dataSize == (64 * 32 * 100 * 6 * ImageFormat_BitWidth(image3->format)) / 8);
   REQUIRE(image3->nextImage == nullptr);
-  REQUIRE(image3->nextType == Image_IT_None);
+  REQUIRE(image3->nextType == Image_NT_None);
   REQUIRE(image3->flags == Image_Flag_Cubemap);
   Image_Destroy(image3);
 }
