@@ -75,6 +75,18 @@ AL2O3_EXTERN_C void Image_FillHeader(uint32_t width,
   header->nextImage = nullptr;
 }
 
+AL2O3_EXTERN_C Image_ImageHeader const* Image_CreateHeaderOnly(	uint32_t width,
+																																 uint32_t height,
+																																 uint32_t depth,
+																																 uint32_t slices,
+																																 enum ImageFormat format) {
+	auto *image = (Image_ImageHeader *) MEMORY_MALLOC(sizeof(Image_ImageHeader));
+	if (!image) { return nullptr; }
+	Image_FillHeader(width, height, depth, slices, format, image);
+
+	return image;
+}
+
 AL2O3_EXTERN_C void Image_Destroy(Image_ImageHeader const *image) {
   // recursively free next chain
   switch (image->nextType) {
