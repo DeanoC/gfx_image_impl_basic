@@ -258,14 +258,14 @@ AL2O3_EXTERN_C size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *i
   }
 
   switch (image->format) {
-    case ImageFormat_PVR_4BPP_BLOCK:
-    case ImageFormat_PVR_4BPPA_BLOCK:
+    case ImageFormat_PVR_4BPP_UNORM_BLOCK:
+    case ImageFormat_PVR_4BPPA_UNORM_BLOCK:
     case ImageFormat_PVR_4BPP_SRGB_BLOCK:
     case ImageFormat_PVR_4BPPA_SRGB_BLOCK:minWidth = 8;
       minHeight = 8;
       break;
-    case ImageFormat_PVR_2BPP_BLOCK:
-    case ImageFormat_PVR_2BPPA_BLOCK:
+    case ImageFormat_PVR_2BPP_UNORM_BLOCK:
+    case ImageFormat_PVR_2BPPA_UNORM_BLOCK:
     case ImageFormat_PVR_2BPP_SRGB_BLOCK:
     case ImageFormat_PVR_2BPPA_SRGB_BLOCK:minWidth = 16;
       minHeight = 8;
