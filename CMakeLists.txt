@@ -17,10 +17,8 @@ project(${LibName})
 set(Interface
 		)
 set(Src
-		block.c
 		convert.cpp
 		create.cpp
-		dds.hpp
 		fetch.hpp
 		hq_resample.hpp
 		image.cpp
