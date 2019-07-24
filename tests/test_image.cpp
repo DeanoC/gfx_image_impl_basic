@@ -1,6 +1,6 @@
 #include "al2o3_platform/platform.h"
 #include "gfx_image/image.h"
-#include "gfx_imageformat/formatcracker.h"
+#include "tiny_imageformat/formatcracker.h"
 #include "gfx_image/create.h"
 #include "al2o3_catch2/catch2.hpp"
 
