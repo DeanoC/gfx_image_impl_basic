@@ -1,19 +1,10 @@
 #include "al2o3_platform/platform.h"
-#include "gfx_imageformat/format.h"
-#include "gfx_imageformat/formatcracker.h"
+#include "tiny_imageformat/format.h"
+#include "tiny_imageformat/formatcracker.h"
 #include "gfx_image/image.h"
 #include "gfx_image/utils.h"
 
 namespace {
-constexpr size_t ImageFormatCount() {
-  size_t count = 0;
-#define IF_START_MACRO
-#define IF_MOD_MACRO(x) count++;
-#define IF_END_MACRO
-#include "gfx_imageformat/format.h"
-  return count;
-}
-
 typedef void (*ImageConvertFunc)(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const*dst);
 typedef bool (*ImageConvertOutOfPlaceFunc)(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const**dst);
 
@@ -247,13 +238,13 @@ IntegerTypeToFloat(int32_t);
 #undef IntegerTypeToFloat
 
 bool g_imageConvertTablesBuild = false;
-bool g_imageConvertCanInPlace[ImageFormatCount()][ImageFormatCount()];
-ImageConvertFunc g_imageConvertDDTable[ImageFormatCount()][ImageFormatCount()];
-ImageConvertOutOfPlaceFunc g_imageConvertOutOfPlaceDDTable[ImageFormatCount()][ImageFormatCount()];
+bool g_imageConvertCanInPlace[ImageFormat_Count()][ImageFormat_Count()];
+ImageConvertFunc g_imageConvertDDTable[ImageFormat_Count()][ImageFormat_Count()];
+ImageConvertOutOfPlaceFunc g_imageConvertOutOfPlaceDDTable[ImageFormat_Count()][ImageFormat_Count()];
 
 void BuildImageConvertTables() {
-  for (auto i = 0u; i < (unsigned int)ImageFormatCount(); ++i) {
-    for (auto j = 0u; j < (unsigned int)ImageFormatCount(); ++j) {
+  for (auto i = 0u; i < (unsigned int)ImageFormat_Count(); ++i) {
+    for (auto j = 0u; j < (unsigned int)ImageFormat_Count(); ++j) {
       g_imageConvertCanInPlace[i][j] = false;
       g_imageConvertDDTable[i][j] = &SlowImageConvert;
       g_imageConvertOutOfPlaceDDTable[i][j] = &SlowImageConvertOutOfPlace;
