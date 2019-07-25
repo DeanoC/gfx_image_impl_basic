@@ -63,7 +63,7 @@ AL2O3_EXTERN_C void Image_FillHeader(uint32_t width,
 		header->dataSize = (pixelCount * blockBitSize) / (blockW * blockH * 8);
 	} else {
 		uint64_t const pixelCount = width * height * depth * slices;
-		header->dataSize = (pixelCount * TinyImageFormat_BitWidth(format)) / 8;
+		header->dataSize = (pixelCount * TinyImageFormat_BitSize(format)) / 8;
   }
 
   header->width = width;
@@ -105,15 +105,17 @@ AL2O3_EXTERN_C void Image_Destroy(Image_ImageHeader const *image) {
 }
 
 // we include fetch after swizzle so hopefully the compiler will inline it...
-AL2O3_EXTERN_C inline enum Image_Channel Image_Channel_Swizzle(enum TinyImageFormat format, enum Image_Channel channel) {
+AL2O3_EXTERN_C inline enum Image_Channel Image_Channel_Swizzle(enum TinyImageFormat format, Image_Channel channel) {
+	if(channel < 0) return channel;
+
   Image_Swizzle swizzler = TinyImageFormat_Swizzle(format);
-  return (enum Image_Channel) swizzler[channel];
+  return (Image_Channel) swizzler[channel];
 }
 
 #include "fetch.hpp"
 #include "put.hpp"
 
-AL2O3_EXTERN_C double Image_GetChannelAt(Image_ImageHeader const *image, enum Image_Channel channel, size_t index) {
+AL2O3_EXTERN_C double Image_GetChannelAt(Image_ImageHeader const *image, Image_Channel channel, size_t index) {
   ASSERT(image);
 
   using namespace Image;
@@ -123,12 +125,12 @@ AL2O3_EXTERN_C double Image_GetChannelAt(Image_ImageHeader const *image, enum Im
   }
 
   // split into bit width grouped formats
-  ASSERT(TinyImageFormat_BitWidth(image->format) >= 8);
+  ASSERT(TinyImageFormat_BitSize(image->format) >= 8);
 
   uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
-      index * (TinyImageFormat_BitWidth(image->format) / 8);
+      index * (TinyImageFormat_BitSize(image->format) / 8);
 
-  switch (TinyImageFormat_BitWidth(image->format)) {
+  switch (TinyImageFormat_BitSize(image->format)) {
     case 256:return BitWidth256ChannelAt(channel, image->format, pixelPtr);
     case 192:return BitWidth192ChannelAt(channel, image->format, pixelPtr);
     case 128:return BitWidth128ChannelAt(channel, image->format, pixelPtr);
@@ -179,7 +181,7 @@ AL2O3_EXTERN_C void Image_SetChannelAt(Image_ImageHeader const *image,
   ASSERT(!TinyImageFormat_IsCompressed(image->format));
 
   // split into bit width grouped formats
-  uint32_t const pixelSize = TinyImageFormat_BitWidth(image->format);
+  uint32_t const pixelSize = TinyImageFormat_BitSize(image->format);
   ASSERT(pixelSize >= 8);
   uint8_t *pixelPtr = (uint8_t *) Image_RawDataPtr(image) + (index * pixelSize / 8);
 
@@ -205,7 +207,7 @@ AL2O3_EXTERN_C void Image_SetChannelAt(Image_ImageHeader const *image,
     case 8:BitWidth8SetChannelAt(channel, image->format, pixelPtr, value);
       break;
     default:LOGERRORF("Bitwidth %i from %s not supported",
-                      TinyImageFormat_BitWidth(image->format),
+                      TinyImageFormat_BitSize(image->format),
                       TinyImageFormat_Name(image->format));
   }
 

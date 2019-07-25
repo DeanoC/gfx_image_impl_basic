@@ -19,37 +19,42 @@ auto PutRaw(uint8_t *ptr_, type_ const value_) -> void {
 }
 
 template<typename type_>
-auto PutHomoChannel(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
-  PutRaw<type_>(ptr_ + (sizeof(type_) * channel_), (type_) value_);
+auto PutHomoChannel(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
+	if(channel_ < 0) return;
+	PutRaw<type_>(ptr_ + (sizeof(type_) * channel_), (type_) value_);
 }
 
 template<typename type_>
-auto PutHomoChannel_NORM(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
-  PutHomoChannel<type_>(channel_, ptr_, value_ * (double) std::numeric_limits<type_>::max());
+auto PutHomoChannel_NORM(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
+	if(channel_ < 0) return;
+	PutHomoChannel<type_>(channel_, ptr_, value_ * (double) std::numeric_limits<type_>::max());
 }
 
 template<typename type_>
-auto PutHomoChannel_sRGB(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
-  PutHomoChannel<type_>(channel_, ptr_, Math_Float2SRGB((float) value_));
+auto PutHomoChannel_sRGB(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
+	if(channel_ < 0) return;
+	PutHomoChannel<type_>(channel_, ptr_, Math_Float2SRGB((float) value_));
 }
 
-auto PutHomoChannel_nibble(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
-  // fetch the byte to merge the nibble into
-  uint8_t bite = ptr_[channel_ / 2];
-  uint8_t nibble = (uint8_t) Math_ClampD(value_, 0.0, 15.0);
-  bite = (channel_ & uint8_t(0x1u)) ?
-         (bite & uint8_t(0xF0u)) | (nibble << 0u) :
-         (bite & uint8_t(0x0Fu)) | (nibble << 4u);
-  ptr_[channel_ / 2] = bite;
-
+auto PutHomoChannel_nibble(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
+	if(channel_ < 0) return;
+		// fetch the byte to merge the nibble into
+		uint8_t bite = ptr_[channel_ / 2];
+		uint8_t nibble = (uint8_t) Math_ClampD(value_, 0.0, 15.0);
+		bite = (channel_ & uint8_t(0x1u)) ?
+					 (bite & uint8_t(0xF0u)) | (nibble << 0u) :
+					 (bite & uint8_t(0x0Fu)) | (nibble << 4u);
+		ptr_[channel_ / 2] = bite;
 }
 
-auto PutHomoChannel_nibble_UNORM(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
-  PutHomoChannel_nibble(channel_, ptr_, value_ * 15.0);
+auto PutHomoChannel_nibble_UNORM(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
+	if(channel_ < 0) return;
+		PutHomoChannel_nibble(channel_, ptr_, value_ * 15.0);
 }
 
-auto PutChannel_R5G6B5_UNORM(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
-  auto pixel = FetchRaw<uint16_t>(ptr_);
+auto PutChannel_R5G6B5_UNORM(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
+	if(channel_ < 0) return;
+	auto pixel = FetchRaw<uint16_t>(ptr_);
   if (channel_ == 0) {
     double const v = Math_ClampD(value_ * 31.0, 0.0, 31.0);
     pixel = (pixel & uint16_t(0x07FF)) | (uint16_t) v << 11u;
@@ -66,7 +71,8 @@ auto PutChannel_R5G6B5_UNORM(uint8_t channel_, uint8_t *ptr_, double const value
   PutRaw(ptr_, pixel);
 }
 
-auto PutChannel_R5G5B5A1_UNORM(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
+auto PutChannel_R5G5B5A1_UNORM(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
+	if(channel_ < 0) return;
   auto pixel = FetchRaw<uint16_t>(ptr_);
   if (channel_ == 0) {
     double const v = Math_ClampD(value_ * 31.0, 0.0, 31.0);
@@ -86,8 +92,9 @@ auto PutChannel_R5G5B5A1_UNORM(uint8_t channel_, uint8_t *ptr_, double const val
   PutRaw(ptr_, pixel);
 }
 
-auto PutChannel_A1R5G5B5_UNORM(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
-  auto pixel = FetchRaw<uint16_t>(ptr_);
+auto PutChannel_A1R5G5B5_UNORM(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
+	if(channel_ < 0) return;
+	auto pixel = FetchRaw<uint16_t>(ptr_);
   if (channel_ == 0) {
     double const v = Math_ClampD(value_, 0.0, 1.0);
     pixel = (pixel & uint16_t(0x7FFFu)) | (uint16_t) v << 15u;
@@ -106,13 +113,14 @@ auto PutChannel_A1R5G5B5_UNORM(uint8_t channel_, uint8_t *ptr_, double const val
   PutRaw(ptr_, pixel);
 }
 
-auto PutHomoChannel_FP16(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
+auto PutHomoChannel_FP16(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
   // clamp half?
   uint16_t h = Math_Float2Half((float) value_);
   PutRaw(ptr_ + (sizeof(uint16_t) * channel_), h);
 }
 
-auto PutChannel_A2R10G10B10(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
+auto PutChannel_A2R10G10B10(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
+	if(channel_ < 0) return;
   auto pixel = FetchRaw<uint32_t>(ptr_);
   if (channel_ == 0) {
     double const v = Math_ClampD(value_, 0.0, 3.0);
@@ -133,12 +141,14 @@ auto PutChannel_A2R10G10B10(uint8_t channel_, uint8_t *ptr_, double const value_
 
 }
 
-auto PutChannel_A2R10G10B10_UNORM(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
-  if (channel_ == 0) { PutChannel_A2R10G10B10(channel_, ptr_, value_ * 3.0); }
+auto PutChannel_A2R10G10B10_UNORM(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
+	if(channel_ < 0) return;
+	if (channel_ == 0) { PutChannel_A2R10G10B10(channel_, ptr_, value_ * 3.0); }
   else { PutChannel_A2R10G10B10(channel_, ptr_, value_ * 1023.0); }
 }
 
-auto PutChannel_X8D24_UNORM(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
+auto PutChannel_X8D24_UNORM(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
+	if(channel_ < 0) return;
   auto pixel = FetchRaw<uint32_t>(ptr_);
   if (channel_ == 0) {
     double const v = Math_ClampD(value_ * 255.0, 0.0, 255.0);
@@ -153,7 +163,8 @@ auto PutChannel_X8D24_UNORM(uint8_t channel_, uint8_t *ptr_, double const value_
   PutRaw(ptr_, pixel);
 }
 
-auto PutChannel_D24X8_UNORM(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
+auto PutChannel_D24X8_UNORM(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
+	if(channel_ < 0) return;
   auto pixel = FetchRaw<uint32_t>(ptr_);
   if (channel_ == 0) {
     static const double Max24Bit = double(1u << 24u) - 1.0;
@@ -168,7 +179,8 @@ auto PutChannel_D24X8_UNORM(uint8_t channel_, uint8_t *ptr_, double const value_
   PutRaw(ptr_, pixel);
 }
 
-auto PutChannel_D16S8_UNORM_UINT(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
+auto PutChannel_D16S8_UNORM_UINT(int8_t channel_, uint8_t *ptr_, double const value_) -> void {
+	if(channel_ < 0) return;
   if (channel_ == 0) {
     double const v = Math_ClampD(value_ * 65535.0, 0.0, 65535.0);
     PutHomoChannel<uint16_t>(0, ptr_, (uint16_t) v);
