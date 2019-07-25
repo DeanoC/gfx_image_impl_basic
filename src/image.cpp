@@ -4,6 +4,7 @@
 #include "gfx_image/image.h"
 #include "al2o3_memory/memory.h"
 
+
 AL2O3_EXTERN_C Image_ImageHeader const *Image_Create(uint32_t width,
                                          uint32_t height,
                                          uint32_t depth,
