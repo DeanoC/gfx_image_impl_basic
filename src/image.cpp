@@ -9,7 +9,7 @@ AL2O3_EXTERN_C Image_ImageHeader const *Image_Create(uint32_t width,
                                          uint32_t height,
                                          uint32_t depth,
                                          uint32_t slices,
-                                         enum ImageFormat format) {
+                                         enum TinyImageFormat format) {
   auto image = Image_CreateNoClear(width, height, depth, slices, format);
   if (image) {
     memset(Image_RawDataPtr(image), 0, image->dataSize);
@@ -22,7 +22,7 @@ AL2O3_EXTERN_C Image_ImageHeader const *Image_CreateNoClear(uint32_t width,
                                                 uint32_t height,
                                                 uint32_t depth,
                                                 uint32_t slices,
-                                                enum ImageFormat format) {
+                                                enum TinyImageFormat format) {
 	if(width == 0)return nullptr;
   if(height == 0) height = 1;
   if(depth == 0) depth = 1;
@@ -42,13 +42,13 @@ AL2O3_EXTERN_C void Image_FillHeader(uint32_t width,
                                uint32_t height,
                                uint32_t depth,
                                uint32_t slices,
-                               enum ImageFormat format,
+                               enum TinyImageFormat format,
                                Image_ImageHeader *header) {
 
 
-  if(ImageFormat_IsCompressed(format)) {
-  	uint32_t const blockW = ImageFormat_WidthOfBlock(format);
-		uint32_t const blockH = ImageFormat_HeightOfBlock(format);
+  if(TinyImageFormat_IsCompressed(format)) {
+  	uint32_t const blockW = TinyImageFormat_WidthOfBlock(format);
+		uint32_t const blockH = TinyImageFormat_HeightOfBlock(format);
 
 		// smallest sized a block compressed texture can have is hte block size
 		width = Math_MaxU32(width, blockW);
@@ -59,11 +59,11 @@ AL2O3_EXTERN_C void Image_FillHeader(uint32_t width,
 		height = (height + (blockH-1)) & ~(blockH-1);
 
 		uint64_t const pixelCount = width * height * depth * slices;
-		uint32_t const blockBitSize = ImageFormat_BitSizeOfBlock(format);
+		uint32_t const blockBitSize = TinyImageFormat_BitSizeOfBlock(format);
 		header->dataSize = (pixelCount * blockBitSize) / (blockW * blockH * 8);
 	} else {
 		uint64_t const pixelCount = width * height * depth * slices;
-		header->dataSize = (pixelCount * ImageFormat_BitWidth(format)) / 8;
+		header->dataSize = (pixelCount * TinyImageFormat_BitWidth(format)) / 8;
   }
 
   header->width = width;
@@ -80,7 +80,7 @@ AL2O3_EXTERN_C Image_ImageHeader const* Image_CreateHeaderOnly(	uint32_t width,
 																																 uint32_t height,
 																																 uint32_t depth,
 																																 uint32_t slices,
-																																 enum ImageFormat format) {
+																																 enum TinyImageFormat format) {
 	auto *image = (Image_ImageHeader *) MEMORY_MALLOC(sizeof(Image_ImageHeader));
 	if (!image) { return nullptr; }
 	Image_FillHeader(width, height, depth, slices, format, image);
@@ -105,8 +105,8 @@ AL2O3_EXTERN_C void Image_Destroy(Image_ImageHeader const *image) {
 }
 
 // we include fetch after swizzle so hopefully the compiler will inline it...
-AL2O3_EXTERN_C inline enum Image_Channel Image_Channel_Swizzle(enum ImageFormat format, enum Image_Channel channel) {
-  Image_Swizzle swizzler = ImageFormat_Swizzle(format);
+AL2O3_EXTERN_C inline enum Image_Channel Image_Channel_Swizzle(enum TinyImageFormat format, enum Image_Channel channel) {
+  Image_Swizzle swizzler = TinyImageFormat_Swizzle(format);
   return (enum Image_Channel) swizzler[channel];
 }
 
@@ -118,17 +118,17 @@ AL2O3_EXTERN_C double Image_GetChannelAt(Image_ImageHeader const *image, enum Im
 
   using namespace Image;
   // seperate out the block compressed format first
-  if (ImageFormat_IsCompressed(image->format)) {
+  if (TinyImageFormat_IsCompressed(image->format)) {
     return Image::CompressedChannelAt(image, channel, index);
   }
 
   // split into bit width grouped formats
-  ASSERT(ImageFormat_BitWidth(image->format) >= 8);
+  ASSERT(TinyImageFormat_BitWidth(image->format) >= 8);
 
   uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
-      index * (ImageFormat_BitWidth(image->format) / 8);
+      index * (TinyImageFormat_BitWidth(image->format) / 8);
 
-  switch (ImageFormat_BitWidth(image->format)) {
+  switch (TinyImageFormat_BitWidth(image->format)) {
     case 256:return BitWidth256ChannelAt(channel, image->format, pixelPtr);
     case 192:return BitWidth192ChannelAt(channel, image->format, pixelPtr);
     case 128:return BitWidth128ChannelAt(channel, image->format, pixelPtr);
@@ -176,10 +176,10 @@ AL2O3_EXTERN_C void Image_SetChannelAt(Image_ImageHeader const *image,
   using namespace Image;
 
   // block compressed not handled ye
-  ASSERT(!ImageFormat_IsCompressed(image->format));
+  ASSERT(!TinyImageFormat_IsCompressed(image->format));
 
   // split into bit width grouped formats
-  uint32_t const pixelSize = ImageFormat_BitWidth(image->format);
+  uint32_t const pixelSize = TinyImageFormat_BitWidth(image->format);
   ASSERT(pixelSize >= 8);
   uint8_t *pixelPtr = (uint8_t *) Image_RawDataPtr(image) + (index * pixelSize / 8);
 
@@ -205,8 +205,8 @@ AL2O3_EXTERN_C void Image_SetChannelAt(Image_ImageHeader const *image,
     case 8:BitWidth8SetChannelAt(channel, image->format, pixelPtr, value);
       break;
     default:LOGERRORF("Bitwidth %i from %s not supported",
-                      ImageFormat_BitWidth(image->format),
-                      ImageFormat_Name(image->format));
+                      TinyImageFormat_BitWidth(image->format),
+                      TinyImageFormat_Name(image->format));
   }
 
 }
@@ -218,13 +218,13 @@ AL2O3_EXTERN_C void Image_GetPixelAt(Image_ImageHeader const *image, Image_Pixel
   memset(pixel, 0, sizeof(Image_PixelD));
 
   // intentional fallthrough on this switch statement
-  switch (ImageFormat_ChannelCount(image->format)) {
+  switch (TinyImageFormat_ChannelCount(image->format)) {
     case 4:pixel->a = Image_GetChannelAt(image, Image_Alpha, index);
     case 3:pixel->b = Image_GetChannelAt(image, Image_Blue, index);
     case 2:pixel->g = Image_GetChannelAt(image, Image_Green, index);
     case 1:pixel->r = Image_GetChannelAt(image, Image_Red, index);
       break;
-    default:ASSERT(ImageFormat_ChannelCount(image->format) <= 4);
+    default:ASSERT(TinyImageFormat_ChannelCount(image->format) <= 4);
       break;
   }
 }
@@ -234,13 +234,13 @@ AL2O3_EXTERN_C void Image_SetPixelAt(Image_ImageHeader const *image, Image_Pixel
   ASSERT(pixel);
 
   // intentional fallthrough on this switch statement
-  switch (ImageFormat_ChannelCount(image->format)) {
+  switch (TinyImageFormat_ChannelCount(image->format)) {
     case 4: Image_SetChannelAt(image, Image_Alpha, index, pixel->a);
     case 3: Image_SetChannelAt(image, Image_Blue, index, pixel->b);
     case 2: Image_SetChannelAt(image, Image_Green, index, pixel->g);
     case 1: Image_SetChannelAt(image, Image_Red, index, pixel->r);
       break;
-    default:ASSERT(ImageFormat_ChannelCount(image->format) <= 4);
+    default:ASSERT(TinyImageFormat_ChannelCount(image->format) <= 4);
       break;
   }
 }
@@ -253,22 +253,22 @@ AL2O3_EXTERN_C size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *i
   uint32_t minWidth = 1;
   uint32_t minHeight = 1;
   uint32_t minDepth = 1;
-  if (ImageFormat_IsCompressed(image->format)) {
-    minWidth = ImageFormat_WidthOfBlock(image->format);
-    minHeight = ImageFormat_HeightOfBlock(image->format);
+  if (TinyImageFormat_IsCompressed(image->format)) {
+    minWidth = TinyImageFormat_WidthOfBlock(image->format);
+    minHeight = TinyImageFormat_HeightOfBlock(image->format);
   }
 
   switch (image->format) {
-    case ImageFormat_PVR_4BPP_UNORM_BLOCK:
-    case ImageFormat_PVR_4BPPA_UNORM_BLOCK:
-    case ImageFormat_PVR_4BPP_SRGB_BLOCK:
-    case ImageFormat_PVR_4BPPA_SRGB_BLOCK:minWidth = 8;
+    case TinyImageFormat_PVR_4BPP_UNORM_BLOCK:
+    case TinyImageFormat_PVR_4BPPA_UNORM_BLOCK:
+    case TinyImageFormat_PVR_4BPP_SRGB_BLOCK:
+    case TinyImageFormat_PVR_4BPPA_SRGB_BLOCK:minWidth = 8;
       minHeight = 8;
       break;
-    case ImageFormat_PVR_2BPP_UNORM_BLOCK:
-    case ImageFormat_PVR_2BPPA_UNORM_BLOCK:
-    case ImageFormat_PVR_2BPP_SRGB_BLOCK:
-    case ImageFormat_PVR_2BPPA_SRGB_BLOCK:minWidth = 16;
+    case TinyImageFormat_PVR_2BPP_UNORM_BLOCK:
+    case TinyImageFormat_PVR_2BPPA_UNORM_BLOCK:
+    case TinyImageFormat_PVR_2BPP_SRGB_BLOCK:
+    case TinyImageFormat_PVR_2BPPA_SRGB_BLOCK:minWidth = 16;
       minHeight = 8;
       break;
     default:break;

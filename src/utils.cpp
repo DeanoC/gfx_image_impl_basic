@@ -12,9 +12,9 @@ AL2O3_EXTERN_C bool Image_GetColorRangeOf(Image_ImageHeader const *src, Image_Pi
 
 	double *minData = &omin->r;
 	double *maxData = &omax->r;
-	for (uint32_t i = 0u; i < ImageFormat_ChannelCount(src->format); ++i) {
-		minData[i] = ImageFormat_Max(src->format, i);
-		maxData[i] = ImageFormat_Min(src->format, i);
+	for (uint32_t i = 0u; i < TinyImageFormat_ChannelCount(src->format); ++i) {
+		minData[i] = TinyImageFormat_Max(src->format, i);
+		maxData[i] = TinyImageFormat_Min(src->format, i);
 	};
 
 	for (auto w = 0u; w < src->slices; ++w) {
@@ -26,7 +26,7 @@ AL2O3_EXTERN_C bool Image_GetColorRangeOf(Image_ImageHeader const *src, Image_Pi
 					Image_GetPixelAt(src, &pixel, index);
 
 					double *data = &pixel.r;
-					for (uint32_t i = 0u; i < ImageFormat_ChannelCount(src->format); ++i) {
+					for (uint32_t i = 0u; i < TinyImageFormat_ChannelCount(src->format); ++i) {
 						if (data[i] < minData[i]) {
 							minData[i] = data[i];
 						}
@@ -55,7 +55,7 @@ AL2O3_EXTERN_C bool Image_GetColorRangeOfD(Image_ImageHeader const *src, double 
 		double *dmin = &pixelMin.r;
 		double *dmax = &pixelMax.r;
 
-		for (uint32_t i = 1u; i < ImageFormat_ChannelCount(src->format); ++i) {
+		for (uint32_t i = 1u; i < TinyImageFormat_ChannelCount(src->format); ++i) {
 			if (dmin[i] < dmin[0]) {
 				dmin[0] = dmin[i];
 			}
@@ -170,17 +170,17 @@ AL2O3_EXTERN_C void Image_CreateMipMapChain(Image_ImageHeader const * image, boo
 
 	Image_ImageHeader const * scratchImage = nullptr;
 
-	uint32_t const numChans = ImageFormat_ChannelCount(image->format);
+	uint32_t const numChans = TinyImageFormat_ChannelCount(image->format);
 	if (generateFromImage) {
-		ImageFormat dblFmt = ImageFormat_R32G32B32A32_SFLOAT;
+		TinyImageFormat dblFmt = TinyImageFormat_R32G32B32A32_SFLOAT;
 		switch (numChans) {
-		case 1:dblFmt = ImageFormat_R32_SFLOAT;
+		case 1:dblFmt = TinyImageFormat_R32_SFLOAT;
 			break;
-		case 2:dblFmt = ImageFormat_R32G32_SFLOAT;
+		case 2:dblFmt = TinyImageFormat_R32G32_SFLOAT;
 			break;
-		case 3:dblFmt = ImageFormat_R32G32B32_SFLOAT;
+		case 3:dblFmt = TinyImageFormat_R32G32B32_SFLOAT;
 			break;
-		case 4:dblFmt = ImageFormat_R32G32B32A32_SFLOAT;
+		case 4:dblFmt = TinyImageFormat_R32G32B32A32_SFLOAT;
 			break;
 		default:
 		case 0: {
@@ -353,7 +353,7 @@ AL2O3_EXTERN_C Image_ImageHeader const * Image_CloneStructure(Image_ImageHeader 
 	return dst;
 }
 
-AL2O3_EXTERN_C Image_ImageHeader const * Image_PreciseConvert(Image_ImageHeader const * image, ImageFormat const newFormat) {
+AL2O3_EXTERN_C Image_ImageHeader const * Image_PreciseConvert(Image_ImageHeader const * image, TinyImageFormat const newFormat) {
 	auto dst = (Image_ImageHeader *)Image_Create(image->width, image->height, image->depth, image->slices, image->format);
 	if (dst == nullptr) {
 		return nullptr;

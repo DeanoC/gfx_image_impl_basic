@@ -5,33 +5,33 @@
 #include "gfx_image/utils.h"
 
 namespace {
-typedef void (*ImageConvertFunc)(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const*dst);
-typedef bool (*ImageConvertOutOfPlaceFunc)(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const**dst);
+typedef void (*ImageConvertFunc)(Image_ImageHeader const*src, TinyImageFormat newFormat, Image_ImageHeader const*dst);
+typedef bool (*ImageConvertOutOfPlaceFunc)(Image_ImageHeader const*src, TinyImageFormat newFormat, Image_ImageHeader const**dst);
 
 #define DefineOutOfPlaceConvert(x) \
-bool x##OutOfPlace(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const**dst) {\
+bool x##OutOfPlace(Image_ImageHeader const*src, TinyImageFormat newFormat, Image_ImageHeader const**dst) {\
   *dst = Image_CloneStructure(src); \
   if (!*dst) { return false; } \
   x(src, newFormat, *dst); \
   return true; \
 }
 
-void SlowImageConvert(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const*dst) {
+void SlowImageConvert(Image_ImageHeader const*src, TinyImageFormat newFormat, Image_ImageHeader const*dst) {
   ASSERT(newFormat == dst->format);
   Image_CopyImage(src, dst);
 }
 
-bool SlowImageConvertOutOfPlace(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const**dst) {
+bool SlowImageConvertOutOfPlace(Image_ImageHeader const*src, TinyImageFormat newFormat, Image_ImageHeader const**dst) {
   *dst = Image_PreciseConvert(src, newFormat);
   return (*dst != nullptr);
 }
 
-void R8G8B8ToR8B8G8A8(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const * dest) {
+void R8G8B8ToR8B8G8A8(Image_ImageHeader const*src, TinyImageFormat newFormat, Image_ImageHeader const * dest) {
 	// this const cast smells wrong but needed because of inplace
 	auto dst = (Image_ImageHeader*)dest;
   do {
-    ASSERT(ImageFormat_ChannelCount(src->format) == 3);
-    ASSERT(ImageFormat_ChannelCount(newFormat) == 4);
+    ASSERT(TinyImageFormat_ChannelCount(src->format) == 3);
+    ASSERT(TinyImageFormat_ChannelCount(newFormat) == 4);
     dst->format = newFormat;
 
     // Fast path for RGB->RGBA8
@@ -60,12 +60,12 @@ void R8G8B8ToR8B8G8A8(Image_ImageHeader const*src, ImageFormat newFormat, Image_
 }
 DefineOutOfPlaceConvert(R8G8B8ToR8B8G8A8)
 
-void R8G8B8A8ToB8G8R8A8(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const * dest) {
+void R8G8B8A8ToB8G8R8A8(Image_ImageHeader const*src, TinyImageFormat newFormat, Image_ImageHeader const * dest) {
 	// this const cast smells wrong but needed because of inplace
 	auto dst = (Image_ImageHeader*)dest;
   do {
-    ASSERT(ImageFormat_ChannelCount(src->format) == 4);
-    ASSERT(ImageFormat_ChannelCount(newFormat) == 4);
+    ASSERT(TinyImageFormat_ChannelCount(src->format) == 4);
+    ASSERT(TinyImageFormat_ChannelCount(newFormat) == 4);
     dst->format = newFormat;
 
     // Fast path for RGBA8->BGRA8 (just swizzle)
@@ -98,7 +98,7 @@ void R8G8B8A8ToB8G8R8A8(Image_ImageHeader const*src, ImageFormat newFormat, Imag
 }
 DefineOutOfPlaceConvert(R8G8B8A8ToB8G8R8A8)
 
-void HalfNToFloatN(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const*dest) {
+void HalfNToFloatN(Image_ImageHeader const*src, TinyImageFormat newFormat, Image_ImageHeader const*dest) {
 	auto dst = (Image_ImageHeader*)dest;
   do {
     // Fast path for half->float
@@ -107,21 +107,21 @@ void HalfNToFloatN(Image_ImageHeader const*src, ImageFormat newFormat, Image_Ima
     size_t nPixels = Image_PixelCountOf(src);
     do {
       uint32_t i = 0;
-      for (i = 0; i < ImageFormat_ChannelCount(src->format); i++) {
+      for (i = 0; i < TinyImageFormat_ChannelCount(src->format); i++) {
         ddata[i] = Math_Half2Float(sdata[i]);
       }
 
-      for (i = 0; i < ImageFormat_ChannelCount(newFormat); i++) {
+      for (i = 0; i < TinyImageFormat_ChannelCount(newFormat); i++) {
         ddata[i] = 0.0f;
       }
 
-      if (ImageFormat_ChannelCount(newFormat) == 4 &&
-          ImageFormat_ChannelCount(src->format) < 4) {
+      if (TinyImageFormat_ChannelCount(newFormat) == 4 &&
+          TinyImageFormat_ChannelCount(src->format) < 4) {
         ddata[i] = 1.0f;
       }
 
-      sdata += sizeof(uint16_t) * ImageFormat_ChannelCount(src->format);
-      ddata += sizeof(float) * ImageFormat_ChannelCount(newFormat);
+      sdata += sizeof(uint16_t) * TinyImageFormat_ChannelCount(src->format);
+      ddata += sizeof(float) * TinyImageFormat_ChannelCount(newFormat);
     } while (--nPixels);
 
 		if (src->nextType != Image_NT_None) {
@@ -137,7 +137,7 @@ void HalfNToFloatN(Image_ImageHeader const*src, ImageFormat newFormat, Image_Ima
 }
 DefineOutOfPlaceConvert(HalfNToFloatN)
 
-void FloatNToHalfN(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const*dest) {
+void FloatNToHalfN(Image_ImageHeader const*src, TinyImageFormat newFormat, Image_ImageHeader const*dest) {
 	auto dst = (Image_ImageHeader*)dest;
   do {
     // Fast path for float->half
@@ -146,20 +146,20 @@ void FloatNToHalfN(Image_ImageHeader const*src, ImageFormat newFormat, Image_Ima
     size_t nPixels = Image_PixelCountOf(src);
     do {
       uint32_t i = 0;
-      for (i = 0; i < ImageFormat_ChannelCount(src->format); i++) {
+      for (i = 0; i < TinyImageFormat_ChannelCount(src->format); i++) {
         ddata[i] = Math_Float2Half(sdata[i]);
       }
 
-      for (i = 0; i < ImageFormat_ChannelCount(newFormat); i++) {
+      for (i = 0; i < TinyImageFormat_ChannelCount(newFormat); i++) {
         ddata[i] = Math_Float2Half(0.0f);
       }
-      if (ImageFormat_ChannelCount(newFormat) == 4 &&
-          ImageFormat_ChannelCount(src->format) < 4) {
+      if (TinyImageFormat_ChannelCount(newFormat) == 4 &&
+          TinyImageFormat_ChannelCount(src->format) < 4) {
         ddata[i] = Math_Float2Half(1.0f);
       }
 
-      sdata += sizeof(uint16_t) * ImageFormat_ChannelCount(src->format);
-      ddata += sizeof(float) * ImageFormat_ChannelCount(newFormat);
+      sdata += sizeof(uint16_t) * TinyImageFormat_ChannelCount(src->format);
+      ddata += sizeof(float) * TinyImageFormat_ChannelCount(newFormat);
     } while (--nPixels);
 
     if (src->nextType != Image_NT_None) {
@@ -175,7 +175,7 @@ void FloatNToHalfN(Image_ImageHeader const*src, ImageFormat newFormat, Image_Ima
 DefineOutOfPlaceConvert(FloatNToHalfN)
 
 #define IntegerTypeNToFloatN(t, n1, n2) \
-void t##ToFloat_##n1##_##n2(Image_ImageHeader const*src, ImageFormat newFormat, Image_ImageHeader const * dest) { \
+void t##ToFloat_##n1##_##n2(Image_ImageHeader const*src, TinyImageFormat newFormat, Image_ImageHeader const * dest) { \
 	auto dst = (Image_ImageHeader*)dest;\
   do { \
     auto sdata = (t const*) Image_RawDataPtr(src); \
@@ -238,13 +238,13 @@ IntegerTypeToFloat(int32_t);
 #undef IntegerTypeToFloat
 
 bool g_imageConvertTablesBuild = false;
-bool g_imageConvertCanInPlace[ImageFormat_Count()][ImageFormat_Count()];
-ImageConvertFunc g_imageConvertDDTable[ImageFormat_Count()][ImageFormat_Count()];
-ImageConvertOutOfPlaceFunc g_imageConvertOutOfPlaceDDTable[ImageFormat_Count()][ImageFormat_Count()];
+bool g_imageConvertCanInPlace[TinyImageFormat_Count()][TinyImageFormat_Count()];
+ImageConvertFunc g_imageConvertDDTable[TinyImageFormat_Count()][TinyImageFormat_Count()];
+ImageConvertOutOfPlaceFunc g_imageConvertOutOfPlaceDDTable[TinyImageFormat_Count()][TinyImageFormat_Count()];
 
 void BuildImageConvertTables() {
-  for (auto i = 0u; i < (unsigned int)ImageFormat_Count(); ++i) {
-    for (auto j = 0u; j < (unsigned int)ImageFormat_Count(); ++j) {
+  for (auto i = 0u; i < (unsigned int)TinyImageFormat_Count(); ++i) {
+    for (auto j = 0u; j < (unsigned int)TinyImageFormat_Count(); ++j) {
       g_imageConvertCanInPlace[i][j] = false;
       g_imageConvertDDTable[i][j] = &SlowImageConvert;
       g_imageConvertOutOfPlaceDDTable[i][j] = &SlowImageConvertOutOfPlace;
@@ -252,9 +252,9 @@ void BuildImageConvertTables() {
   }
 
 #define FDT(s, d, f, i) \
-  g_imageConvertDDTable[ImageFormat_##s][ImageFormat_##d] = f; \
-  g_imageConvertOutOfPlaceDDTable[ImageFormat_##s][ImageFormat_##d] = f##OutOfPlace; \
-  g_imageConvertCanInPlace[ImageFormat_##s][ImageFormat_##d] = i;
+  g_imageConvertDDTable[TinyImageFormat_##s][TinyImageFormat_##d] = f; \
+  g_imageConvertOutOfPlaceDDTable[TinyImageFormat_##s][TinyImageFormat_##d] = f##OutOfPlace; \
+  g_imageConvertCanInPlace[TinyImageFormat_##s][TinyImageFormat_##d] = i;
 
 #define FDT_SET(s, d, f, i) \
   FDT(s##_UNORM, d##_UNORM, f, i); \
@@ -266,9 +266,9 @@ void BuildImageConvertTables() {
   FDT(s##_SRGB, d##_SRGB, f, i);
 
 #define FDT_ITOF(t, s, d, n1, n2, inplace) \
-  g_imageConvertDDTable[ImageFormat_##s][ImageFormat_##d] = &t##ToFloat_##n1##_##n2; \
-  g_imageConvertOutOfPlaceDDTable[ImageFormat_##s][ImageFormat_##d] = &t##ToFloat_##n1##_##n2##OutOfPlace; \
-  g_imageConvertCanInPlace[ImageFormat_##s][ImageFormat_##d] = (inplace);
+  g_imageConvertDDTable[TinyImageFormat_##s][TinyImageFormat_##d] = &t##ToFloat_##n1##_##n2; \
+  g_imageConvertOutOfPlaceDDTable[TinyImageFormat_##s][TinyImageFormat_##d] = &t##ToFloat_##n1##_##n2##OutOfPlace; \
+  g_imageConvertCanInPlace[TinyImageFormat_##s][TinyImageFormat_##d] = (inplace);
 
 #define FDT_ITOF_SET(t, s, d, n1, n2, w) \
   FDT_ITOF(t, s##_UNORM, d##_SFLOAT, n1, n2, (w*n1) <= (32*n2)) \
@@ -356,7 +356,7 @@ destSize;
 
 } // end anon namespace
 
-AL2O3_EXTERN_C Image_ImageHeader const * Image_FastConvert(Image_ImageHeader const * src, ImageFormat const newFormat, bool allowInPlace) {
+AL2O3_EXTERN_C Image_ImageHeader const * Image_FastConvert(Image_ImageHeader const * src, TinyImageFormat const newFormat, bool allowInPlace) {
   ASSERT(src);
 
   if (allowInPlace && src->format == newFormat) {

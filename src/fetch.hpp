@@ -125,297 +125,297 @@ auto CompressedChannelAt(Image_ImageHeader const *image, enum Image_Channel chan
 }
 
 auto BitWidth256ChannelAt(enum Image_Channel const channel_,
-                          enum ImageFormat const fmt_,
+                          enum TinyImageFormat const fmt_,
                           uint8_t const *ptr_) -> double {
   switch (fmt_) {
-    case ImageFormat_R64G64B64A64_UINT:
+    case TinyImageFormat_R64G64B64A64_UINT:
       return FetchHomoChannel<uint64_t>(Image_Channel_Swizzle(fmt_, channel_),
                                         ptr_); // potentially lossy!
-    case ImageFormat_R64G64B64A64_SINT:
+    case TinyImageFormat_R64G64B64A64_SINT:
       return FetchHomoChannel<int64_t>(Image_Channel_Swizzle(fmt_, channel_),
                                        ptr_); // potentially lossy!
-    case ImageFormat_R64G64B64A64_SFLOAT:return FetchHomoChannel<double>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    default:LOGERRORF("%s not handled by bitWidth256ChannelAt", ImageFormat_Name(fmt_));
+    case TinyImageFormat_R64G64B64A64_SFLOAT:return FetchHomoChannel<double>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    default:LOGERRORF("%s not handled by bitWidth256ChannelAt", TinyImageFormat_Name(fmt_));
       return 0.0;
   }
 }
 
 auto BitWidth192ChannelAt(enum Image_Channel const channel_,
-                          enum ImageFormat const fmt_,
+                          enum TinyImageFormat const fmt_,
                           uint8_t const *ptr_) -> double {
   switch (fmt_) {
-    case ImageFormat_R64G64B64_UINT:
+    case TinyImageFormat_R64G64B64_UINT:
       return FetchHomoChannel<uint64_t>(Image_Channel_Swizzle(fmt_, channel_),
                                         ptr_); // potentially lossy!
-    case ImageFormat_R64G64B64_SINT:
+    case TinyImageFormat_R64G64B64_SINT:
       return FetchHomoChannel<int64_t>(Image_Channel_Swizzle(fmt_, channel_),
                                        ptr_); // potentially lossy!
-    case ImageFormat_R64G64B64_SFLOAT:return FetchHomoChannel<double>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    default:LOGERRORF("%s not handled by bitWidth192ChannelAt", ImageFormat_Name(fmt_));
+    case TinyImageFormat_R64G64B64_SFLOAT:return FetchHomoChannel<double>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    default:LOGERRORF("%s not handled by bitWidth192ChannelAt", TinyImageFormat_Name(fmt_));
       return 0.0;
   }
 }
 
 auto BitWidth128ChannelAt(enum Image_Channel const channel_,
-                          enum ImageFormat const fmt_,
+                          enum TinyImageFormat const fmt_,
                           uint8_t const *ptr_) -> double {
 
   switch (fmt_) {
-    case ImageFormat_R64G64_UINT:
+    case TinyImageFormat_R64G64_UINT:
       return FetchHomoChannel<uint64_t>(Image_Channel_Swizzle(fmt_, channel_),
                                         ptr_); // potentially lossy!
-    case ImageFormat_R64G64_SINT:
+    case TinyImageFormat_R64G64_SINT:
       return FetchHomoChannel<int64_t>(Image_Channel_Swizzle(fmt_, channel_),
                                        ptr_); // potentially lossy!
-    case ImageFormat_R64G64_SFLOAT:return FetchHomoChannel<double>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R32G32B32A32_UINT:return FetchHomoChannel<uint32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R32G32B32A32_SINT:return FetchHomoChannel<int32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R32G32B32A32_SFLOAT:return FetchHomoChannel<float>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    default:LOGERRORF("%s not handled by bitWidth128ChannelAt", ImageFormat_Name(fmt_));
+    case TinyImageFormat_R64G64_SFLOAT:return FetchHomoChannel<double>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R32G32B32A32_UINT:return FetchHomoChannel<uint32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R32G32B32A32_SINT:return FetchHomoChannel<int32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R32G32B32A32_SFLOAT:return FetchHomoChannel<float>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    default:LOGERRORF("%s not handled by bitWidth128ChannelAt", TinyImageFormat_Name(fmt_));
       return 0.0;
   }
 }
 
 auto BitWidth96ChannelAt(enum Image_Channel const channel_,
-                         enum ImageFormat const fmt_,
+                         enum TinyImageFormat const fmt_,
                          uint8_t const *ptr_) -> double {
   switch (fmt_) {
-    case ImageFormat_R32G32B32_UINT:return FetchHomoChannel<uint32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R32G32B32_SINT:return FetchHomoChannel<int32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R32G32B32_SFLOAT:return FetchHomoChannel<float>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    default:LOGERRORF("%s not handled by bitWidth96ChannelAt", ImageFormat_Name(fmt_));
+    case TinyImageFormat_R32G32B32_UINT:return FetchHomoChannel<uint32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R32G32B32_SINT:return FetchHomoChannel<int32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R32G32B32_SFLOAT:return FetchHomoChannel<float>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    default:LOGERRORF("%s not handled by bitWidth96ChannelAt", TinyImageFormat_Name(fmt_));
       return 0.0;
   }
 }
 
 auto BitWidth64ChannelAt(enum Image_Channel const channel_,
-                         enum ImageFormat const fmt_,
+                         enum TinyImageFormat const fmt_,
                          uint8_t const *ptr_) -> double {
   switch (fmt_) {
-    case ImageFormat_R64_UINT:
+    case TinyImageFormat_R64_UINT:
       return FetchHomoChannel<uint64_t>(Image_Channel_Swizzle(fmt_, channel_),
                                         ptr_); // potentially lossy!
-    case ImageFormat_R64_SINT:
+    case TinyImageFormat_R64_SINT:
       return FetchHomoChannel<int64_t>(Image_Channel_Swizzle(fmt_, channel_),
                                        ptr_); // potentially lossy!
-    case ImageFormat_R64_SFLOAT:return FetchHomoChannel<double>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R32G32_UINT:return FetchHomoChannel<uint32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R32G32_SINT:return FetchHomoChannel<int32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R32G32_SFLOAT:return FetchHomoChannel<float>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R16G16B16A16_UNORM:
+    case TinyImageFormat_R64_SFLOAT:return FetchHomoChannel<double>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R32G32_UINT:return FetchHomoChannel<uint32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R32G32_SINT:return FetchHomoChannel<int32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R32G32_SFLOAT:return FetchHomoChannel<float>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R16G16B16A16_UNORM:
       return FetchHomoChannel_NORM<uint16_t>(Image_Channel_Swizzle(fmt_, channel_),
                                              ptr_);
-    case ImageFormat_R16G16B16A16_SNORM:
+    case TinyImageFormat_R16G16B16A16_SNORM:
       return FetchHomoChannel_NORM<int16_t>(Image_Channel_Swizzle(fmt_, channel_),
                                             ptr_);
-    case ImageFormat_R16G16B16A16_UINT:
-    case ImageFormat_R16G16B16A16_USCALED:
+    case TinyImageFormat_R16G16B16A16_UINT:
+    case TinyImageFormat_R16G16B16A16_USCALED:
       return FetchHomoChannel<uint16_t>(Image_Channel_Swizzle(fmt_, channel_),
                                         ptr_);
-    case ImageFormat_R16G16B16A16_SINT:
-    case ImageFormat_R16G16B16A16_SSCALED:
+    case TinyImageFormat_R16G16B16A16_SINT:
+    case TinyImageFormat_R16G16B16A16_SSCALED:
       return FetchHomoChannel<int16_t>(Image_Channel_Swizzle(fmt_, channel_),
                                        ptr_);
-    case ImageFormat_R16G16B16A16_SFLOAT:return FetchHomoChannel_FP16(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_D32_SFLOAT_S8_UINT:
+    case TinyImageFormat_R16G16B16A16_SFLOAT:return FetchHomoChannel_FP16(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_D32_SFLOAT_S8_UINT:
       if (channel_ == Image_Red) {
         return FetchHomoChannel<float>(Image_Red, ptr_);
       } else {
         return FetchHomoChannel<uint8_t>(Image_Red, ptr_ + 4);
       }
-    default:LOGERRORF("%s not handled by bitWidth64ChannelAt", ImageFormat_Name(fmt_));
+    default:LOGERRORF("%s not handled by bitWidth64ChannelAt", TinyImageFormat_Name(fmt_));
       return 0.0;
   }
 }
 
 auto BitWidth48ChannelAt(enum Image_Channel const channel_,
-                         enum ImageFormat const fmt_,
+                         enum TinyImageFormat const fmt_,
                          uint8_t const *ptr_) -> double {
   switch (fmt_) {
-    case ImageFormat_R16G16B16_UNORM:
+    case TinyImageFormat_R16G16B16_UNORM:
       return FetchHomoChannel_NORM<uint16_t>(Image_Channel_Swizzle(fmt_, channel_),
                                              ptr_);
-    case ImageFormat_R16G16B16_SNORM:
+    case TinyImageFormat_R16G16B16_SNORM:
       return FetchHomoChannel_NORM<int16_t>(Image_Channel_Swizzle(fmt_, channel_),
                                             ptr_);
-    case ImageFormat_R16G16B16_UINT:
-    case ImageFormat_R16G16B16_USCALED:return FetchHomoChannel<uint16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R16G16B16_SINT:
-    case ImageFormat_R16G16B16_SSCALED:return FetchHomoChannel<int16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R16G16B16_SFLOAT:return FetchHomoChannel_FP16(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    default:LOGERRORF("%s not handled by bitWidth48ChannelAt", ImageFormat_Name(fmt_));
+    case TinyImageFormat_R16G16B16_UINT:
+    case TinyImageFormat_R16G16B16_USCALED:return FetchHomoChannel<uint16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R16G16B16_SINT:
+    case TinyImageFormat_R16G16B16_SSCALED:return FetchHomoChannel<int16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R16G16B16_SFLOAT:return FetchHomoChannel_FP16(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    default:LOGERRORF("%s not handled by bitWidth48ChannelAt", TinyImageFormat_Name(fmt_));
       return 0.0;
   }
 }
 
 auto BitWidth32ChannelAt(enum Image_Channel const channel_,
-                         enum ImageFormat const fmt_,
+                         enum TinyImageFormat const fmt_,
                          uint8_t const *ptr_) -> double {
   switch (fmt_) {
-    case ImageFormat_R32_UINT:return FetchHomoChannel<uint32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R32_SINT:return FetchHomoChannel<int32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_D32_SFLOAT:
-    case ImageFormat_R32_SFLOAT:return FetchHomoChannel<float>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R16G16_UNORM:return FetchHomoChannel_NORM<uint16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R16G16_SNORM:return FetchHomoChannel_NORM<int16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R16G16_UINT:
-    case ImageFormat_R16G16_USCALED:return FetchHomoChannel<uint16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R16G16_SINT:
-    case ImageFormat_R16G16_SSCALED:return FetchHomoChannel<int16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R16G16_SFLOAT:return FetchHomoChannel_FP16(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8G8B8A8_UNORM:return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8G8B8A8_SNORM:return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8G8B8A8_USCALED:
-    case ImageFormat_R8G8B8A8_UINT:return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8G8B8A8_SSCALED:
-    case ImageFormat_R8G8B8A8_SINT:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8G8B8A8_SRGB:
+    case TinyImageFormat_R32_UINT:return FetchHomoChannel<uint32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R32_SINT:return FetchHomoChannel<int32_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_D32_SFLOAT:
+    case TinyImageFormat_R32_SFLOAT:return FetchHomoChannel<float>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R16G16_UNORM:return FetchHomoChannel_NORM<uint16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R16G16_SNORM:return FetchHomoChannel_NORM<int16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R16G16_UINT:
+    case TinyImageFormat_R16G16_USCALED:return FetchHomoChannel<uint16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R16G16_SINT:
+    case TinyImageFormat_R16G16_SSCALED:return FetchHomoChannel<int16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R16G16_SFLOAT:return FetchHomoChannel_FP16(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8B8A8_UNORM:return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8B8A8_SNORM:return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8B8A8_USCALED:
+    case TinyImageFormat_R8G8B8A8_UINT:return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8B8A8_SSCALED:
+    case TinyImageFormat_R8G8B8A8_SINT:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8B8A8_SRGB:
       if (channel_ == Image_Alpha) {
         return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
       } else {
         return FetchHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
       }
-    case ImageFormat_B8G8R8A8_UNORM:return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_B8G8R8A8_SNORM:return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_B8G8R8A8_USCALED:
-    case ImageFormat_B8G8R8A8_UINT:return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_B8G8R8A8_SSCALED:
-    case ImageFormat_B8G8R8A8_SINT:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_B8G8R8A8_SRGB:
+    case TinyImageFormat_B8G8R8A8_UNORM:return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_B8G8R8A8_SNORM:return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_B8G8R8A8_USCALED:
+    case TinyImageFormat_B8G8R8A8_UINT:return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_B8G8R8A8_SSCALED:
+    case TinyImageFormat_B8G8R8A8_SINT:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_B8G8R8A8_SRGB:
       if (channel_ == Image_Alpha) {
         return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
       } else {
         return FetchHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
       }
-    case ImageFormat_A8B8G8R8_UNORM_PACK32:
+    case TinyImageFormat_A8B8G8R8_UNORM_PACK32:
       return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_),
                                             ptr_);
-    case ImageFormat_A8B8G8R8_SNORM_PACK32:
+    case TinyImageFormat_A8B8G8R8_SNORM_PACK32:
       return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_),
                                            ptr_);
-    case ImageFormat_A8B8G8R8_USCALED_PACK32:
-    case ImageFormat_A8B8G8R8_UINT_PACK32:
+    case TinyImageFormat_A8B8G8R8_USCALED_PACK32:
+    case TinyImageFormat_A8B8G8R8_UINT_PACK32:
       return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_),
                                        ptr_);
-    case ImageFormat_A8B8G8R8_SSCALED_PACK32:
-    case ImageFormat_A8B8G8R8_SINT_PACK32:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_A8B8G8R8_SRGB_PACK32:
+    case TinyImageFormat_A8B8G8R8_SSCALED_PACK32:
+    case TinyImageFormat_A8B8G8R8_SINT_PACK32:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_A8B8G8R8_SRGB_PACK32:
       if (channel_ == Image_Alpha) {
         return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
       } else {
         return FetchHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
       }
-    case ImageFormat_A2R10G10B10_UNORM_PACK32:
+    case TinyImageFormat_A2R10G10B10_UNORM_PACK32:
       return FetchChannel_A2R10G10B10_UNORM(Image_Channel_Swizzle(fmt_, channel_),
                                             ptr_);
-    case ImageFormat_A2R10G10B10_USCALED_PACK32:
-    case ImageFormat_A2R10G10B10_UINT_PACK32:
+    case TinyImageFormat_A2R10G10B10_USCALED_PACK32:
+    case TinyImageFormat_A2R10G10B10_UINT_PACK32:
       return FetchChannel_A2R10G10B10(Image_Channel_Swizzle(fmt_, channel_),
                                       ptr_);
-    case ImageFormat_A2B10G10R10_UNORM_PACK32:
+    case TinyImageFormat_A2B10G10R10_UNORM_PACK32:
       return FetchChannel_A2R10G10B10_UNORM(Image_Channel_Swizzle(fmt_, channel_),
                                             ptr_);
-    case ImageFormat_A2B10G10R10_USCALED_PACK32:
-    case ImageFormat_A2B10G10R10_UINT_PACK32:
+    case TinyImageFormat_A2B10G10R10_USCALED_PACK32:
+    case TinyImageFormat_A2B10G10R10_UINT_PACK32:
       return FetchChannel_A2R10G10B10(Image_Channel_Swizzle(fmt_, channel_),
                                       ptr_);
-    case ImageFormat_X8_D24_UNORM_PACK32:return FetchChannel_X8D24_UNORM(channel_, ptr_);
-    case ImageFormat_D24_UNORM_S8_UINT:return FetchChannel_D24X8_UNORM(channel_, ptr_);
+    case TinyImageFormat_X8_D24_UNORM_PACK32:return FetchChannel_X8D24_UNORM(channel_, ptr_);
+    case TinyImageFormat_D24_UNORM_S8_UINT:return FetchChannel_D24X8_UNORM(channel_, ptr_);
 
       // TODO decoders for these exotic formats
 //		case GenericTextureFormat::B10G11R11_UFLOAT_PACK32:
 //		case GenericTextureFormat::E5B9G9R9_UFLOAT_PACK32:
-    default:LOGERRORF("%s not handled by bitWidth32ChannelAt", ImageFormat_Name(fmt_));
+    default:LOGERRORF("%s not handled by bitWidth32ChannelAt", TinyImageFormat_Name(fmt_));
       return 0.0;
   }
 }
 
 auto BitWidth24ChannelAt(enum Image_Channel const channel_,
-                         enum ImageFormat const fmt_,
+                         enum TinyImageFormat const fmt_,
                          uint8_t const *ptr_) -> double {
   switch (fmt_) {
-    case ImageFormat_R8G8B8_UNORM:return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8G8B8_SNORM:return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8G8B8_USCALED:
-    case ImageFormat_R8G8B8_UINT:return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8G8B8_SSCALED:
-    case ImageFormat_R8G8B8_SINT:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8G8B8_SRGB:return FetchHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8B8_UNORM:return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8B8_SNORM:return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8B8_USCALED:
+    case TinyImageFormat_R8G8B8_UINT:return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8B8_SSCALED:
+    case TinyImageFormat_R8G8B8_SINT:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8B8_SRGB:return FetchHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
 
-    case ImageFormat_B8G8R8_UNORM:return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_B8G8R8_SNORM:return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_B8G8R8_USCALED:
-    case ImageFormat_B8G8R8_UINT:return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_B8G8R8_SSCALED:
-    case ImageFormat_B8G8R8_SINT:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_B8G8R8_SRGB:return FetchHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_B8G8R8_UNORM:return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_B8G8R8_SNORM:return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_B8G8R8_USCALED:
+    case TinyImageFormat_B8G8R8_UINT:return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_B8G8R8_SSCALED:
+    case TinyImageFormat_B8G8R8_SINT:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_B8G8R8_SRGB:return FetchHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
 
-    case ImageFormat_D16_UNORM_S8_UINT:return FetchChannel_D16S8_UNORM_UINT(channel_, ptr_);
+    case TinyImageFormat_D16_UNORM_S8_UINT:return FetchChannel_D16S8_UNORM_UINT(channel_, ptr_);
 
-    default:LOGERRORF("%s not handled by bitWidth24ChannelAt", ImageFormat_Name(fmt_));
+    default:LOGERRORF("%s not handled by bitWidth24ChannelAt", TinyImageFormat_Name(fmt_));
       return 0.0;
   }
 }
 
 auto BitWidth16ChannelAt(enum Image_Channel const channel_,
-                         enum ImageFormat const fmt_,
+                         enum TinyImageFormat const fmt_,
                          uint8_t const *ptr_) -> double {
   switch (fmt_) {
-    case ImageFormat_R4G4B4A4_UNORM_PACK16:
+    case TinyImageFormat_R4G4B4A4_UNORM_PACK16:
       return FetchHomoChannel_nibble_UNORM(Image_Channel_Swizzle(fmt_, channel_),
                                            ptr_);
-    case ImageFormat_B4G4R4A4_UNORM_PACK16:
+    case TinyImageFormat_B4G4R4A4_UNORM_PACK16:
       return FetchHomoChannel_nibble_UNORM(Image_Channel_Swizzle(fmt_, channel_),
                                            ptr_);
-    case ImageFormat_R5G6B5_UNORM_PACK16:return FetchChannel_R5G6B5_UNORM(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_B5G6R5_UNORM_PACK16:return FetchChannel_R5G6B5_UNORM(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R5G5B5A1_UNORM_PACK16:
+    case TinyImageFormat_R5G6B5_UNORM_PACK16:return FetchChannel_R5G6B5_UNORM(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_B5G6R5_UNORM_PACK16:return FetchChannel_R5G6B5_UNORM(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R5G5B5A1_UNORM_PACK16:
       return FetchChannel_R5G5B5A1_UNORM(Image_Channel_Swizzle(fmt_, channel_),
                                          ptr_);
-    case ImageFormat_B5G5R5A1_UNORM_PACK16:
+    case TinyImageFormat_B5G5R5A1_UNORM_PACK16:
       return FetchChannel_R5G5B5A1_UNORM(Image_Channel_Swizzle(fmt_, channel_),
                                          ptr_);
-    case ImageFormat_A1R5G5B5_UNORM_PACK16:
+    case TinyImageFormat_A1R5G5B5_UNORM_PACK16:
       return FetchChannel_A1R5G5B5_UNORM(Image_Channel_Swizzle(fmt_, channel_),
                                          ptr_);
 
-    case ImageFormat_R8G8_UNORM:return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8G8_SNORM:return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8G8_USCALED:
-    case ImageFormat_R8G8_UINT:return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8G8_SSCALED:
-    case ImageFormat_R8G8_SINT:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8G8_SRGB:return FetchHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_D16_UNORM:
-    case ImageFormat_R16_UNORM:return FetchHomoChannel_NORM<uint16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R16_SNORM:return FetchHomoChannel_NORM<int16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R16_UINT:
-    case ImageFormat_R16_USCALED:return FetchHomoChannel<uint16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R16_SINT:
-    case ImageFormat_R16_SSCALED:return FetchHomoChannel<int16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R16_SFLOAT:return FetchHomoChannel_FP16(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    default:LOGERRORF("%s not handled by bitWidth16ChannelAt", ImageFormat_Name(fmt_));
+    case TinyImageFormat_R8G8_UNORM:return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8_SNORM:return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8_USCALED:
+    case TinyImageFormat_R8G8_UINT:return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8_SSCALED:
+    case TinyImageFormat_R8G8_SINT:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8G8_SRGB:return FetchHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_D16_UNORM:
+    case TinyImageFormat_R16_UNORM:return FetchHomoChannel_NORM<uint16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R16_SNORM:return FetchHomoChannel_NORM<int16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R16_UINT:
+    case TinyImageFormat_R16_USCALED:return FetchHomoChannel<uint16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R16_SINT:
+    case TinyImageFormat_R16_SSCALED:return FetchHomoChannel<int16_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R16_SFLOAT:return FetchHomoChannel_FP16(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    default:LOGERRORF("%s not handled by bitWidth16ChannelAt", TinyImageFormat_Name(fmt_));
       return 0.0;
   }
 }
 
 auto BitWidth8ChannelAt(enum Image_Channel const channel_,
-                        enum ImageFormat const fmt_,
+                        enum TinyImageFormat const fmt_,
                         uint8_t const *ptr_) -> double {
   switch (fmt_) {
-    case ImageFormat_R4G4_UNORM_PACK8:
+    case TinyImageFormat_R4G4_UNORM_PACK8:
       return FetchHomoChannel_nibble_UNORM(Image_Channel_Swizzle(fmt_, channel_),
                                            ptr_);
-    case ImageFormat_R8_UNORM:return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8_SNORM:return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_S8_UINT:
-    case ImageFormat_R8_USCALED:
-    case ImageFormat_R8_UINT:return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8_SSCALED:
-    case ImageFormat_R8_SINT:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
-    case ImageFormat_R8_SRGB:return FetchHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8_UNORM:return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8_SNORM:return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_S8_UINT:
+    case TinyImageFormat_R8_USCALED:
+    case TinyImageFormat_R8_UINT:return FetchHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8_SSCALED:
+    case TinyImageFormat_R8_SINT:return FetchHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
+    case TinyImageFormat_R8_SRGB:return FetchHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
 
-    default:LOGERRORF("%s not handled by bitWidth8ChannelAt", ImageFormat_Name(fmt_));
+    default:LOGERRORF("%s not handled by bitWidth8ChannelAt", TinyImageFormat_Name(fmt_));
       return 0.0;
   }
 }
