@@ -58,12 +58,12 @@ AL2O3_EXTERN_C void Image_FillHeader(uint32_t width,
   	width = (width + (blockW-1)) & ~(blockW-1);
 		height = (height + (blockH-1)) & ~(blockH-1);
 
-		uint64_t const pixelCount = width * height * depth * slices;
+		uint64_t const pixelCount = (uint64_t)width * (uint64_t)height * (uint64_t)depth * (uint64_t)slices;
 		uint32_t const blockBitSize = TinyImageFormat_BitSizeOfBlock(format);
-		header->dataSize = (pixelCount * blockBitSize) / (blockW * blockH * 8);
+		header->dataSize = (pixelCount * (uint64_t)blockBitSize) / ((uint64_t)blockW * (uint64_t)blockH * 8ULL);
 	} else {
-		uint64_t const pixelCount = width * height * depth * slices;
-		header->dataSize = (pixelCount * TinyImageFormat_BitSize(format)) / 8;
+		uint64_t const pixelCount = (uint64_t)width * (uint64_t)height * (uint64_t)depth * (uint64_t)slices;
+		header->dataSize = (pixelCount * (uint64_t)TinyImageFormat_BitSize(format)) / 8ULL;
   }
 
   header->width = width;
@@ -89,6 +89,7 @@ AL2O3_EXTERN_C Image_ImageHeader const* Image_CreateHeaderOnly(	uint32_t width,
 }
 
 AL2O3_EXTERN_C void Image_Destroy(Image_ImageHeader const *image) {
+	if(!image) return;
   // recursively free next chain
   switch (image->nextType) {
     case Image_NT_MipMaps:

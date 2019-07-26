@@ -6,254 +6,260 @@
 
 TEST_CASE("Image create/destroy 1D (C)", "[Image]") {
   Image_ImageHeader const *image0 = Image_Create1D(256, TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image0);
-  REQUIRE(image0->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image0->width == 256);
-  REQUIRE(image0->height == 1);
-  REQUIRE(image0->depth == 1);
-  REQUIRE(image0->slices == 1);
-  REQUIRE(image0->dataSize == (256 * TinyImageFormat_BitSize(image0->format)) / 8);
-  REQUIRE(image0->nextImage == nullptr);
-  REQUIRE(image0->nextType == Image_NT_None);
-  REQUIRE(image0->flags == 0);
+  CHECK(image0);
+  CHECK(image0->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
+  CHECK(image0->width == 256);
+  CHECK(image0->height == 1);
+  CHECK(image0->depth == 1);
+  CHECK(image0->slices == 1);
+  CHECK(image0->dataSize == (256 * TinyImageFormat_BitSize(image0->format)) / 8);
+  CHECK(image0->nextImage == nullptr);
+  CHECK(image0->nextType == Image_NT_None);
+  CHECK(image0->flags == 0);
   Image_Destroy(image0);
 
   Image_ImageHeader const *image1 = Image_Create1DNoClear(64, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image1);
-  REQUIRE(image1->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image1->width == 64);
-  REQUIRE(image1->height == 1);
-  REQUIRE(image1->depth == 1);
-  REQUIRE(image1->slices == 1);
-  REQUIRE(image1->dataSize == (64 * TinyImageFormat_BitSize(image1->format)) / 8);
-  REQUIRE(image1->nextImage == nullptr);
-  REQUIRE(image1->nextType == Image_NT_None);
-  REQUIRE(image1->flags == 0);
+  CHECK(image1);
+  CHECK(image1->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image1->width == 64);
+  CHECK(image1->height == 1);
+  CHECK(image1->depth == 1);
+  CHECK(image1->slices == 1);
+  CHECK(image1->dataSize == (64 * TinyImageFormat_BitSize(image1->format)) / 8);
+  CHECK(image1->nextImage == nullptr);
+  CHECK(image1->nextType == Image_NT_None);
+  CHECK(image1->flags == 0);
   Image_Destroy(image1);
 
   Image_ImageHeader const *image2 = Image_Create1DArray(256, 20, TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image2);
-  REQUIRE(image2->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image2->width == 256);
-  REQUIRE(image2->height == 1);
-  REQUIRE(image2->depth == 1);
-  REQUIRE(image2->slices == 20);
-  REQUIRE(image2->dataSize == (256 * 20 * TinyImageFormat_BitSize(image2->format)) / 8);
-  REQUIRE(image2->nextImage == nullptr);
-  REQUIRE(image2->nextType == Image_NT_None);
-  REQUIRE(image2->flags == 0);
+  CHECK(image2);
+  CHECK(image2->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
+  CHECK(image2->width == 256);
+  CHECK(image2->height == 1);
+  CHECK(image2->depth == 1);
+  CHECK(image2->slices == 20);
+  CHECK(image2->dataSize == (256 * 20 * TinyImageFormat_BitSize(image2->format)) / 8);
+  CHECK(image2->nextImage == nullptr);
+  CHECK(image2->nextType == Image_NT_None);
+  CHECK(image2->flags == 0);
   Image_Destroy(image2);
 
   Image_ImageHeader const *image3 = Image_Create1DArrayNoClear(64, 100, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image3);
-  REQUIRE(image3->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image3->width == 64);
-  REQUIRE(image3->height == 1);
-  REQUIRE(image3->depth == 1);
-  REQUIRE(image3->slices == 100);
-  REQUIRE(image3->dataSize == (64 * 100 * TinyImageFormat_BitSize(image3->format)) / 8);
-  REQUIRE(image3->nextImage == nullptr);
-  REQUIRE(image3->nextType == Image_NT_None);
-  REQUIRE(image3->flags == 0);
+  CHECK(image3);
+  CHECK(image3->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image3->width == 64);
+  CHECK(image3->height == 1);
+  CHECK(image3->depth == 1);
+  CHECK(image3->slices == 100);
+  CHECK(image3->dataSize == (64 * 100 * TinyImageFormat_BitSize(image3->format)) / 8);
+  CHECK(image3->nextImage == nullptr);
+  CHECK(image3->nextType == Image_NT_None);
+  CHECK(image3->flags == 0);
   Image_Destroy(image3);
 
 }
 
 TEST_CASE("Image create/destroy 2D (C)", "[Image]") {
   Image_ImageHeader const *image0 = Image_Create2D(256, 256, TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image0);
-  REQUIRE(image0->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image0->width == 256);
-  REQUIRE(image0->height == 256);
-  REQUIRE(image0->depth == 1);
-  REQUIRE(image0->slices == 1);
-  REQUIRE(image0->dataSize == (256 * 256 * TinyImageFormat_BitSize(image0->format)) / 8);
-  REQUIRE(image0->nextImage == nullptr);
-  REQUIRE(image0->nextType == Image_NT_None);
-  REQUIRE(image0->flags == 0);
+  CHECK(image0);
+  CHECK(image0->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
+  CHECK(image0->width == 256);
+  CHECK(image0->height == 256);
+  CHECK(image0->depth == 1);
+  CHECK(image0->slices == 1);
+  CHECK(image0->dataSize == (256 * 256 * TinyImageFormat_BitSize(image0->format)) / 8);
+  CHECK(image0->nextImage == nullptr);
+  CHECK(image0->nextType == Image_NT_None);
+  CHECK(image0->flags == 0);
   Image_Destroy(image0);
 
   Image_ImageHeader const *image1 = Image_Create2DNoClear(64, 128, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image1);
-  REQUIRE(image1->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image1->width == 64);
-  REQUIRE(image1->height == 128);
-  REQUIRE(image1->depth == 1);
-  REQUIRE(image1->slices == 1);
-  REQUIRE(image1->dataSize == (64 * 128 * TinyImageFormat_BitSize(image1->format)) / 8);
-  REQUIRE(image1->nextImage == nullptr);
-  REQUIRE(image1->nextType == Image_NT_None);
-  REQUIRE(image1->flags == 0);
+  CHECK(image1);
+  CHECK(image1->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image1->width == 64);
+  CHECK(image1->height == 128);
+  CHECK(image1->depth == 1);
+  CHECK(image1->slices == 1);
+  CHECK(image1->dataSize == (64 * 128 * TinyImageFormat_BitSize(image1->format)) / 8);
+  CHECK(image1->nextImage == nullptr);
+  CHECK(image1->nextType == Image_NT_None);
+  CHECK(image1->flags == 0);
   Image_Destroy(image1);
 
   Image_ImageHeader const *image2 = Image_Create2DArray(256, 256, 20, TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image2);
-  REQUIRE(image2->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image2->width == 256);
-  REQUIRE(image2->height == 256);
-  REQUIRE(image2->depth == 1);
-  REQUIRE(image2->slices == 20);
-  REQUIRE(image2->dataSize == (256 * 256 * 20 * TinyImageFormat_BitSize(image2->format)) / 8);
-  REQUIRE(image2->nextImage == nullptr);
-  REQUIRE(image2->nextType == Image_NT_None);
-  REQUIRE(image2->flags == 0);
+  CHECK(image2);
+  CHECK(image2->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
+  CHECK(image2->width == 256);
+  CHECK(image2->height == 256);
+  CHECK(image2->depth == 1);
+  CHECK(image2->slices == 20);
+  CHECK(image2->dataSize == (256 * 256 * 20 * TinyImageFormat_BitSize(image2->format)) / 8);
+  CHECK(image2->nextImage == nullptr);
+  CHECK(image2->nextType == Image_NT_None);
+  CHECK(image2->flags == 0);
   Image_Destroy(image2);
 
   Image_ImageHeader const *image3 = Image_Create2DArrayNoClear(64, 32, 100, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image3);
-  REQUIRE(image3->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image3->width == 64);
-  REQUIRE(image3->height == 32);
-  REQUIRE(image3->depth == 1);
-  REQUIRE(image3->slices == 100);
-  REQUIRE(image3->dataSize == (64 * 32 * 100 * TinyImageFormat_BitSize(image3->format)) / 8);
-  REQUIRE(image3->nextImage == nullptr);
-  REQUIRE(image3->nextType == Image_NT_None);
-  REQUIRE(image3->flags == 0);
+  CHECK(image3);
+  CHECK(image3->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image3->width == 64);
+  CHECK(image3->height == 32);
+  CHECK(image3->depth == 1);
+  CHECK(image3->slices == 100);
+  CHECK(image3->dataSize == (64 * 32 * 100 * TinyImageFormat_BitSize(image3->format)) / 8);
+  CHECK(image3->nextImage == nullptr);
+  CHECK(image3->nextType == Image_NT_None);
+  CHECK(image3->flags == 0);
   Image_Destroy(image3);
 }
 
 TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
   Image_ImageHeader const *image0 = Image_Create3D(256, 256, 16, TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image0);
-  REQUIRE(image0->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image0->width == 256);
-  REQUIRE(image0->height == 256);
-  REQUIRE(image0->depth == 16);
-  REQUIRE(image0->slices == 1);
-  REQUIRE(image0->dataSize == (256 * 256 * 16 * TinyImageFormat_BitSize(image0->format)) / 8);
-  REQUIRE(image0->nextImage == nullptr);
-  REQUIRE(image0->nextType == Image_NT_None);
-  REQUIRE(image0->flags == 0);
+  CHECK(image0);
+  CHECK(image0->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
+  CHECK(image0->width == 256);
+  CHECK(image0->height == 256);
+  CHECK(image0->depth == 16);
+  CHECK(image0->slices == 1);
+  CHECK(image0->dataSize == (256ULL * 256 * 16 * TinyImageFormat_BitSize(image0->format)) / 8);
+  CHECK(image0->nextImage == nullptr);
+  CHECK(image0->nextType == Image_NT_None);
+  CHECK(image0->flags == 0);
   Image_Destroy(image0);
 
   Image_ImageHeader const *image1 = Image_Create3DNoClear(64, 128, 256, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image1);
-  REQUIRE(image1->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image1->width == 64);
-  REQUIRE(image1->height == 128);
-  REQUIRE(image1->depth == 256);
-  REQUIRE(image1->slices == 1);
-  REQUIRE(image1->dataSize == (64 * 128 * 256 * TinyImageFormat_BitSize(image1->format)) / 8);
-  REQUIRE(image1->nextImage == nullptr);
-  REQUIRE(image1->nextType == Image_NT_None);
-  REQUIRE(image1->flags == 0);
+  CHECK(image1);
+  CHECK(image1->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image1->width == 64);
+  CHECK(image1->height == 128);
+  CHECK(image1->depth == 256);
+  CHECK(image1->slices == 1);
+  CHECK(image1->dataSize == (64 * 128 * 256 * TinyImageFormat_BitSize(image1->format)) / 8);
+  CHECK(image1->nextImage == nullptr);
+  CHECK(image1->nextType == Image_NT_None);
+  CHECK(image1->flags == 0);
   Image_Destroy(image1);
 
   Image_ImageHeader const *image2 = Image_Create3DArray(256, 256, 256, 20, TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image2);
-  REQUIRE(image2->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image2->width == 256);
-  REQUIRE(image2->height == 256);
-  REQUIRE(image2->depth == 256);
-  REQUIRE(image2->slices == 20);
-  REQUIRE(image2->dataSize == (256 * 256 * 256 * 20 * TinyImageFormat_BitSize(image2->format)) / 8);
-  REQUIRE(image2->nextImage == nullptr);
-  REQUIRE(image2->nextType == Image_NT_None);
-  REQUIRE(image2->flags == 0);
+  CHECK(image2);
+  CHECK(image2->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
+  CHECK(image2->width == 256);
+  CHECK(image2->height == 256);
+  CHECK(image2->depth == 256);
+  CHECK(image2->slices == 20);
+  CHECK(image2->dataSize == (256ULL * 256 * 256 * 20 * TinyImageFormat_BitSize(image2->format)) / 8);
+  CHECK(image2->nextImage == nullptr);
+  CHECK(image2->nextType == Image_NT_None);
+  CHECK(image2->flags == 0);
   Image_Destroy(image2);
 
   Image_ImageHeader const *image3 = Image_Create3DArrayNoClear(64, 32, 16, 100, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image3);
-  REQUIRE(image3->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image3->width == 64);
-  REQUIRE(image3->height == 32);
-  REQUIRE(image3->depth == 16);
-  REQUIRE(image3->slices == 100);
-  REQUIRE(image3->dataSize == (64 * 32 * 16 * 100 * TinyImageFormat_BitSize(image3->format)) / 8);
-  REQUIRE(image3->nextImage == nullptr);
-  REQUIRE(image3->nextType == Image_NT_None);
-  REQUIRE(image3->flags == 0);
+  CHECK(image3);
+  CHECK(image3->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image3->width == 64);
+  CHECK(image3->height == 32);
+  CHECK(image3->depth == 16);
+  CHECK(image3->slices == 100);
+  CHECK(image3->dataSize == (64 * 32 * 16 * 100 * TinyImageFormat_BitSize(image3->format)) / 8);
+  CHECK(image3->nextImage == nullptr);
+  CHECK(image3->nextType == Image_NT_None);
+  CHECK(image3->flags == 0);
   Image_Destroy(image3);
 
   // HUGE test
   Image_ImageHeader const *image4 = Image_Create3DArrayNoClear(1024, 1024, 16, 10, TinyImageFormat_R64G64B64A64_SFLOAT);
-  REQUIRE(image4);
-  REQUIRE(image4->format == TinyImageFormat_R64G64B64A64_SFLOAT);
-  REQUIRE(image4->width == 1024);
-  REQUIRE(image4->height == 1024);
-  REQUIRE(image4->depth == 16);
-  REQUIRE(image4->slices == 10);
-  REQUIRE(image4->dataSize == (1024 * 1024 * 16 * 100 * TinyImageFormat_BitSize(image4->format)) / 8);
-  REQUIRE(image4->nextImage == nullptr);
-  REQUIRE(image4->nextType == Image_NT_None);
-  REQUIRE(image4->flags == 0);
+  CHECK(image4);
+  CHECK(image4->format == TinyImageFormat_R64G64B64A64_SFLOAT);
+  CHECK(image4->width == 1024);
+  CHECK(image4->height == 1024);
+  CHECK(image4->depth == 16);
+  CHECK(image4->slices == 10);
+  CHECK(image4->dataSize == (1024ULL * 1024ULL * 16ULL * 10ULL * (uint64_t)TinyImageFormat_BitSize(image4->format)) / 8ULL);
+  CHECK(image4->nextImage == nullptr);
+  CHECK(image4->nextType == Image_NT_None);
+  CHECK(image4->flags == 0);
   Image_Destroy(image4);
+
+	// Out of memory test (at least for 2019!)
+	Image_ImageHeader const *image5 = Image_Create3DArrayNoClear(1024, 1024, 1024, 1024, TinyImageFormat_R64G64B64A64_SFLOAT);
+	CHECK(image5 == nullptr);
+	Image_Destroy(image5);
+
 }
 
 TEST_CASE("Image create/destroy 2D Cubemap (C)", "[Image]") {
   Image_ImageHeader const *image0 = Image_CreateCubemap(256, 256, TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image0);
-  REQUIRE(image0->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image0->width == 256);
-  REQUIRE(image0->height == 256);
-  REQUIRE(image0->depth == 1);
-  REQUIRE(image0->slices == 6);
-  REQUIRE(image0->dataSize == (256 * 256 * 6 * TinyImageFormat_BitSize(image0->format)) / 8);
-  REQUIRE(image0->nextImage == nullptr);
-  REQUIRE(image0->nextType == Image_NT_None);
-  REQUIRE(image0->flags == Image_Flag_Cubemap);
+  CHECK(image0);
+  CHECK(image0->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
+  CHECK(image0->width == 256);
+  CHECK(image0->height == 256);
+  CHECK(image0->depth == 1);
+  CHECK(image0->slices == 6);
+  CHECK(image0->dataSize == (256 * 256 * 6 * TinyImageFormat_BitSize(image0->format)) / 8);
+  CHECK(image0->nextImage == nullptr);
+  CHECK(image0->nextType == Image_NT_None);
+  CHECK(image0->flags == Image_Flag_Cubemap);
   Image_Destroy(image0);
 
   Image_ImageHeader const *image1 = Image_CreateCubemapNoClear(64, 128, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image1);
-  REQUIRE(image1->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image1->width == 64);
-  REQUIRE(image1->height == 128);
-  REQUIRE(image1->depth == 1);
-  REQUIRE(image1->slices == 6);
-  REQUIRE(image1->dataSize == (64 * 128 * 6 * TinyImageFormat_BitSize(image1->format)) / 8);
-  REQUIRE(image1->nextImage == nullptr);
-  REQUIRE(image1->nextType == Image_NT_None);
-  REQUIRE(image1->flags == Image_Flag_Cubemap);
+  CHECK(image1);
+  CHECK(image1->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image1->width == 64);
+  CHECK(image1->height == 128);
+  CHECK(image1->depth == 1);
+  CHECK(image1->slices == 6);
+  CHECK(image1->dataSize == (64 * 128 * 6 * TinyImageFormat_BitSize(image1->format)) / 8);
+  CHECK(image1->nextImage == nullptr);
+  CHECK(image1->nextType == Image_NT_None);
+  CHECK(image1->flags == Image_Flag_Cubemap);
   Image_Destroy(image1);
 
   Image_ImageHeader const *image2 = Image_CreateCubemapArray(256, 256, 20, TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image2);
-  REQUIRE(image2->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image2->width == 256);
-  REQUIRE(image2->height == 256);
-  REQUIRE(image2->depth == 1);
-  REQUIRE(image2->slices == 20 * 6);
-  REQUIRE(image2->dataSize == (256 * 256 * 20 * 6 * TinyImageFormat_BitSize(image2->format)) / 8);
-  REQUIRE(image2->nextImage == nullptr);
-  REQUIRE(image2->nextType == Image_NT_None);
-  REQUIRE(image2->flags == Image_Flag_Cubemap);
+  CHECK(image2);
+  CHECK(image2->format == TinyImageFormat_A8B8G8R8_UNORM_PACK32);
+  CHECK(image2->width == 256);
+  CHECK(image2->height == 256);
+  CHECK(image2->depth == 1);
+  CHECK(image2->slices == 20 * 6);
+  CHECK(image2->dataSize == (256 * 256 * 20 * 6 * TinyImageFormat_BitSize(image2->format)) / 8);
+  CHECK(image2->nextImage == nullptr);
+  CHECK(image2->nextType == Image_NT_None);
+  CHECK(image2->flags == Image_Flag_Cubemap);
   Image_Destroy(image2);
 
   Image_ImageHeader const *image3 = Image_CreateCubemapArrayNoClear(64, 32, 100, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image3);
-  REQUIRE(image3->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
-  REQUIRE(image3->width == 64);
-  REQUIRE(image3->height == 32);
-  REQUIRE(image3->depth == 1);
-  REQUIRE(image3->slices == 100 * 6);
-  REQUIRE(image3->dataSize == (64 * 32 * 100 * 6 * TinyImageFormat_BitSize(image3->format)) / 8);
-  REQUIRE(image3->nextImage == nullptr);
-  REQUIRE(image3->nextType == Image_NT_None);
-  REQUIRE(image3->flags == Image_Flag_Cubemap);
+  CHECK(image3);
+  CHECK(image3->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image3->width == 64);
+  CHECK(image3->height == 32);
+  CHECK(image3->depth == 1);
+  CHECK(image3->slices == 100 * 6);
+  CHECK(image3->dataSize == (64 * 32 * 100 * 6 * TinyImageFormat_BitSize(image3->format)) / 8);
+  CHECK(image3->nextImage == nullptr);
+  CHECK(image3->nextType == Image_NT_None);
+  CHECK(image3->flags == Image_Flag_Cubemap);
   Image_Destroy(image3);
 }
 
 TEST_CASE("Calculate Index (C)", "[Image]") {
   Image_ImageHeader const *image = Image_Create3DArray(17, 17, 17, 17, TinyImageFormat_A8B8G8R8_UNORM_PACK32);
-  REQUIRE(image);
+  CHECK(image);
   uint64_t const pixelSize = TinyImageFormat_BitSize(image->format);
-  REQUIRE(image->dataSize == (17 * 17 * 17 * 17 * pixelSize) / 8);
+  CHECK(image->dataSize == (17 * 17 * 17 * 17 * pixelSize) / 8);
 
-  REQUIRE(pixelSize / 8 == 4);
+  CHECK(pixelSize / 8 == 4);
 
   // check the image is cleared
 
   uint8_t *ptr = (uint8_t *) Image_RawDataPtr(image);
-  REQUIRE(ptr);
-  REQUIRE(ptr == (uint8_t *) (image + 1));
+  CHECK(ptr);
+  CHECK(ptr == (uint8_t *) (image + 1));
 
   uint64_t accum0 = 0;
   for (auto i = 0u; i < image->dataSize; ++i) {
     accum0 += ptr[i];
   }
-  REQUIRE(accum0 == 0);
+  CHECK(accum0 == 0);
 
   for (auto i = 0u; i < image->dataSize; ++i) {
     ptr[i] = (uint8_t) (i & 0xFFu);
@@ -264,7 +270,7 @@ TEST_CASE("Calculate Index (C)", "[Image]") {
       for (uint32_t y = 0; y < image->height; ++y) {
         for (uint32_t x = 0; x < image->width; ++x) {
           size_t index = Image_CalculateIndex(image, x, y, d, s);
-          REQUIRE(ptr[index] == (uint8_t) (index & 0xFFu));
+          CHECK(ptr[index] == (uint8_t) (index & 0xFFu));
         }
       }
     }
@@ -282,21 +288,21 @@ void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, enum TinyIm
     LOGINFOF("Testing %s", TinyImageFormat_Name(fmt_));
   }
 
-  REQUIRE(img);
-  REQUIRE(img->width == w_);
-  REQUIRE(img->height == h_);
-  REQUIRE(img->depth == d_);
-  REQUIRE(img->slices == s_);
-  REQUIRE(img->format == fmt_);
+  CHECK(img);
+  CHECK(img->width == w_);
+  CHECK(img->height == h_);
+  CHECK(img->depth == d_);
+  CHECK(img->slices == s_);
+  CHECK(img->format == fmt_);
   uint64_t const pixelSize = TinyImageFormat_BitSize(img->format);
-  REQUIRE(img->dataSize == (w_ * h_ * d_ * s_ * pixelSize) / 8);
+  CHECK(img->dataSize == (w_ * h_ * d_ * s_ * pixelSize) / 8);
 
   // check the image is cleared
   uint8_t *ptr = (uint8_t *) Image_RawDataPtr(img);
-  REQUIRE(ptr);
-  REQUIRE(ptr == (uint8_t *) (img + 1));
+  CHECK(ptr);
+  CHECK(ptr == (uint8_t *) (img + 1));
   for (auto i = 0u; i < img->dataSize; ++i) {
-    REQUIRE(ptr[i] == 0);
+    CHECK(ptr[i] == 0);
   }
 
   double const mins[4] = {
@@ -337,6 +343,7 @@ void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, enum TinyIm
                      x, y, z, s,
                      pixel.r, pixel.g, pixel.b, pixel.a);
           }
+
           size_t const index = Image_CalculateIndex(img, x, y, z, s);
           Image_SetPixelAt(img, &pixel, index);
         }
@@ -373,14 +380,24 @@ void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, enum TinyIm
             expected.a = expected.a / maxs[3];
           }
 
+					Image_Swizzle swizz = TinyImageFormat_Swizzle(img->format);
+					if(swizz[0] == -1) expected.r = 0.0;
+					if(swizz[0] == -2) expected.r = 1.0;
+					if(swizz[1] == -1) expected.g = 0.0;
+					if(swizz[1] == -2) expected.g = 1.0;
+					if(swizz[2] == -1) expected.b = 0.0;
+					if(swizz[2] == -2) expected.b = 1.0;
+					if(swizz[3] == -1) expected.a = 0.0;
+					if(swizz[3] == -2) expected.a = 1.0;
+
           // delibrate fallthrough
           switch (TinyImageFormat_ChannelCount(fmt_)) {
-            case 4: REQUIRE(expected.a == Approx(pixel.a));
-            case 3: REQUIRE(expected.b == Approx(pixel.b));
-            case 2: REQUIRE(expected.g == Approx(pixel.g));
-            case 1: REQUIRE(expected.r == Approx(pixel.r));
+            case 4: CHECK(expected.a == Approx(pixel.a));
+            case 3: CHECK(expected.b == Approx(pixel.b));
+            case 2: CHECK(expected.g == Approx(pixel.g));
+            case 1: CHECK(expected.r == Approx(pixel.r));
               break;
-            default:REQUIRE(TinyImageFormat_ChannelCount(fmt_) <= 4);
+            default:CHECK(TinyImageFormat_ChannelCount(fmt_) <= 4);
           }
         }
       }
@@ -408,11 +425,6 @@ void ImageTesterFiltered(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, enu
   // mixed normalised / unnormalised format which the tester doesn't handle yet
   if (fmt_ == TinyImageFormat_D24_UNORM_S8_UINT) { return; }
   if (fmt_ == TinyImageFormat_D16_UNORM_S8_UINT) { return; }
-
-  // low precision normalised alpha not working yet
-  if (fmt_ == TinyImageFormat_A1R5G5B5_UNORM_PACK16) { return; }
-  if (fmt_ == TinyImageFormat_A2R10G10B10_UNORM_PACK32) { return; }
-  if (fmt_ == TinyImageFormat_A2B10G10R10_UNORM_PACK32) { return; }
 
   ImageTester(w_, h_, d_, s_, fmt_, doLog_);
 }
@@ -464,5 +476,6 @@ IMAGE_TEST_CASE(D24_UNORM_S8_UINT, 16, 1, 1, 1, true)
 #define IF_START_MACRO
 #define IF_MOD_MACRO(x) IMAGE_TEST_CASE_FILTERED(x, 256, 4, 2, 2, false)
 #define IF_END_MACRO
+#include "tiny_imageformat/format.h"
 
 #endif

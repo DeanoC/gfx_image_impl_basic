@@ -371,60 +371,36 @@ auto BitWidth32SetChannelAt(enum Image_Channel const channel_,
       break;
     case TinyImageFormat_R16G16_SFLOAT: PutHomoChannel_FP16(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       break;
-    case TinyImageFormat_R8G8B8A8_UNORM: PutHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
+		case TinyImageFormat_A8B8G8R8_UNORM_PACK32:
+		case TinyImageFormat_A8R8G8B8_UNORM_PACK32:
+    case TinyImageFormat_R8G8B8A8_UNORM:
+		case TinyImageFormat_B8G8R8A8_UNORM:
+    	PutHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       break;
-    case TinyImageFormat_R8G8B8A8_SNORM: PutHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
+		case TinyImageFormat_A8B8G8R8_SNORM_PACK32:
+    case TinyImageFormat_R8G8B8A8_SNORM:
+		case TinyImageFormat_B8G8R8A8_SNORM:
+			PutHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       break;
+		case TinyImageFormat_A8B8G8R8_USCALED_PACK32:
+		case TinyImageFormat_A8B8G8R8_UINT_PACK32:
     case TinyImageFormat_R8G8B8A8_USCALED:
-    case TinyImageFormat_R8G8B8A8_UINT: PutHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
+    case TinyImageFormat_R8G8B8A8_UINT:
+		case TinyImageFormat_B8G8R8A8_USCALED:
+		case TinyImageFormat_B8G8R8A8_UINT:
+			PutHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       break;
-    case TinyImageFormat_R8G8B8A8_SSCALED:
-    case TinyImageFormat_R8G8B8A8_SINT: PutHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
+		case TinyImageFormat_A8B8G8R8_SSCALED_PACK32:
+		case TinyImageFormat_A8B8G8R8_SINT_PACK32:
+		case TinyImageFormat_R8G8B8A8_SSCALED:
+    case TinyImageFormat_R8G8B8A8_SINT:
+		case TinyImageFormat_B8G8R8A8_SSCALED:
+		case TinyImageFormat_B8G8R8A8_SINT:
+			PutHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       break;
+		case TinyImageFormat_A8B8G8R8_SRGB_PACK32:
     case TinyImageFormat_R8G8B8A8_SRGB:
-      if (channel_ == Image_Alpha) {
-        PutHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      } else {
-        PutHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      }
-      break;
-    case TinyImageFormat_B8G8R8A8_UNORM: PutHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      break;
-    case TinyImageFormat_B8G8R8A8_SNORM: PutHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      break;
-    case TinyImageFormat_B8G8R8A8_USCALED:
-    case TinyImageFormat_B8G8R8A8_UINT: PutHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      break;
-    case TinyImageFormat_B8G8R8A8_SSCALED:
-    case TinyImageFormat_B8G8R8A8_SINT: PutHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      break;
-    case TinyImageFormat_B8G8R8A8_SRGB:
-      if (channel_ == Image_Alpha) {
-        PutHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      } else {
-        PutHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      }
-      break;
-    case TinyImageFormat_A8B8G8R8_UNORM_PACK32:
-      PutHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_),
-                                   ptr_,
-                                   value_);
-      break;
-    case TinyImageFormat_A8B8G8R8_SNORM_PACK32:
-      PutHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_),
-                                  ptr_,
-                                  value_);
-      break;
-    case TinyImageFormat_A8B8G8R8_USCALED_PACK32:
-    case TinyImageFormat_A8B8G8R8_UINT_PACK32:
-      PutHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_),
-                              ptr_,
-                              value_);
-      break;
-    case TinyImageFormat_A8B8G8R8_SSCALED_PACK32:
-    case TinyImageFormat_A8B8G8R8_SINT_PACK32: PutHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      break;
-    case TinyImageFormat_A8B8G8R8_SRGB_PACK32:
+		case TinyImageFormat_B8G8R8A8_SRGB:
       if (channel_ == Image_Alpha) {
         PutHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       } else {
@@ -432,23 +408,15 @@ auto BitWidth32SetChannelAt(enum Image_Channel const channel_,
       }
       break;
     case TinyImageFormat_A2R10G10B10_UNORM_PACK32:
+		case TinyImageFormat_A2B10G10R10_UNORM_PACK32:
       PutChannel_A2R10G10B10_UNORM(Image_Channel_Swizzle(fmt_, channel_),
                                    ptr_,
                                    value_);
       break;
     case TinyImageFormat_A2R10G10B10_USCALED_PACK32:
     case TinyImageFormat_A2R10G10B10_UINT_PACK32:
-      PutChannel_A2R10G10B10(Image_Channel_Swizzle(fmt_, channel_),
-                             ptr_,
-                             value_);
-      break;
-    case TinyImageFormat_A2B10G10R10_UNORM_PACK32:
-      PutChannel_A2R10G10B10_UNORM(Image_Channel_Swizzle(fmt_, channel_),
-                                   ptr_,
-                                   value_);
-      break;
-    case TinyImageFormat_A2B10G10R10_USCALED_PACK32:
-    case TinyImageFormat_A2B10G10R10_UINT_PACK32:
+		case TinyImageFormat_A2B10G10R10_USCALED_PACK32:
+		case TinyImageFormat_A2B10G10R10_UINT_PACK32:
       PutChannel_A2R10G10B10(Image_Channel_Swizzle(fmt_, channel_),
                              ptr_,
                              value_);
@@ -466,33 +434,31 @@ auto BitWidth24SetChannelAt(enum Image_Channel const channel_,
                             uint8_t *ptr_,
                             double const value_) -> void {
   switch (fmt_) {
-    case TinyImageFormat_R8G8B8_UNORM: PutHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
+    case TinyImageFormat_R8G8B8_UNORM:
+		case TinyImageFormat_B8G8R8_UNORM:
+			PutHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       break;
-    case TinyImageFormat_R8G8B8_SNORM: PutHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
+    case TinyImageFormat_R8G8B8_SNORM:
+		case TinyImageFormat_B8G8R8_SNORM:
+			PutHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       break;
     case TinyImageFormat_R8G8B8_USCALED:
-    case TinyImageFormat_R8G8B8_UINT: PutHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
+    case TinyImageFormat_R8G8B8_UINT:
+		case TinyImageFormat_B8G8R8_USCALED:
+		case TinyImageFormat_B8G8R8_UINT:
+			PutHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       break;
     case TinyImageFormat_R8G8B8_SSCALED:
-    case TinyImageFormat_R8G8B8_SINT: PutHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
+    case TinyImageFormat_R8G8B8_SINT:
+		case TinyImageFormat_B8G8R8_SSCALED:
+		case TinyImageFormat_B8G8R8_SINT:
+			PutHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       break;
-    case TinyImageFormat_R8G8B8_SRGB: PutHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
+    case TinyImageFormat_R8G8B8_SRGB:
+		case TinyImageFormat_B8G8R8_SRGB:
+    	PutHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       break;
-
-    case TinyImageFormat_B8G8R8_UNORM: PutHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      break;
-    case TinyImageFormat_B8G8R8_SNORM: PutHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      break;
-    case TinyImageFormat_B8G8R8_USCALED:
-    case TinyImageFormat_B8G8R8_UINT: PutHomoChannel<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      break;
-    case TinyImageFormat_B8G8R8_SSCALED:
-    case TinyImageFormat_B8G8R8_SINT: PutHomoChannel<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      break;
-    case TinyImageFormat_B8G8R8_SRGB: PutHomoChannel_sRGB<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      break;
-
-    case TinyImageFormat_D16_UNORM_S8_UINT: PutChannel_D16S8_UNORM_UINT(channel_, ptr_, value_);
+      case TinyImageFormat_D16_UNORM_S8_UINT: PutChannel_D16S8_UNORM_UINT(channel_, ptr_, value_);
       break;
     default:LOGERRORF("%s not handled", TinyImageFormat_Name(fmt_));
   }
@@ -505,24 +471,18 @@ auto BitWidth16SetChannelAt(enum Image_Channel const channel_,
                             double const value_) -> void {
   switch (fmt_) {
     case TinyImageFormat_R4G4B4A4_UNORM_PACK16:
+		case TinyImageFormat_B4G4R4A4_UNORM_PACK16:
+		case TinyImageFormat_A4R4G4B4_UNORM_PACK16:
       PutHomoChannel_nibble_UNORM(Image_Channel_Swizzle(fmt_, channel_),
                                   ptr_,
                                   value_);
       break;
-    case TinyImageFormat_B4G4R4A4_UNORM_PACK16:
-      PutHomoChannel_nibble_UNORM(Image_Channel_Swizzle(fmt_, channel_),
-                                  ptr_,
-                                  value_);
-      break;
-    case TinyImageFormat_R5G6B5_UNORM_PACK16: PutChannel_R5G6B5_UNORM(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
-      break;
-    case TinyImageFormat_B5G6R5_UNORM_PACK16: PutChannel_R5G6B5_UNORM(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
+
+    case TinyImageFormat_R5G6B5_UNORM_PACK16:
+    case TinyImageFormat_B5G6R5_UNORM_PACK16:
+    	PutChannel_R5G6B5_UNORM(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       break;
     case TinyImageFormat_R5G5B5A1_UNORM_PACK16:
-      PutChannel_R5G5B5A1_UNORM(Image_Channel_Swizzle(fmt_, channel_),
-                                ptr_,
-                                value_);
-      break;
     case TinyImageFormat_B5G5R5A1_UNORM_PACK16:
       PutChannel_R5G5B5A1_UNORM(Image_Channel_Swizzle(fmt_, channel_),
                                 ptr_,
@@ -574,7 +534,9 @@ auto BitWidth8SetChannelAt(enum Image_Channel const channel_,
                                   ptr_,
                                   value_);
       break;
-    case TinyImageFormat_R8_UNORM: PutHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
+    case TinyImageFormat_R8_UNORM:
+		case TinyImageFormat_A8_UNORM:
+			PutHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       break;
     case TinyImageFormat_R8_SNORM: PutHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_, value_);
       break;
