@@ -1,4 +1,5 @@
 #include "al2o3_platform/platform.h"
+#include "al2o3_memory/memory.h"
 #include "tiny_imageformat/format.h"
 #include "tiny_imageformat/formatcracker.h"
 #include "gfx_image/image.h"
@@ -354,7 +355,7 @@ AL2O3_EXTERN_C Image_ImageHeader const * Image_CloneStructure(Image_ImageHeader 
 }
 
 AL2O3_EXTERN_C Image_ImageHeader const * Image_PreciseConvert(Image_ImageHeader const * image, TinyImageFormat const newFormat) {
-	auto dst = (Image_ImageHeader *)Image_Create(image->width, image->height, image->depth, image->slices, image->format);
+	auto dst = (Image_ImageHeader *)Image_Create(image->width, image->height, image->depth, image->slices, newFormat);
 	if (dst == nullptr) {
 		return nullptr;
 	}
@@ -366,3 +367,26 @@ AL2O3_EXTERN_C Image_ImageHeader const * Image_PreciseConvert(Image_ImageHeader 
 	return dst;
 }
 
+AL2O3_EXTERN_C Image_ImageHeader const* Image_PackMipmaps(Image_ImageHeader const * image) {
+	if(Image_HasPackedMipMaps(image)) return image;
+
+	size_t const numLevels = Image_LinkedImageCountOf(image);
+	if(numLevels == 1) return image;
+
+	size_t const packedSized = Image_ByteCountOfImageChainOf(image);
+	auto *newImage = (Image_ImageHeader *) MEMORY_MALLOC(sizeof(Image_ImageHeader) + packedSized);
+	Image_FillHeader(image->width, image->height, image->depth, image->slices, image->format, newImage);
+	newImage->dataSize = packedSized;
+	newImage->flags |= Image_Flag_PackedMipMaps;
+	newImage->packedMipMapCount = numLevels;
+
+	uint8_t * dstPtr = (uint8_t*) Image_RawDataPtr(newImage);
+	for(size_t i=0;i < numLevels;++i) {
+		ASSERT(dstPtr - (uint8_t *)Image_RawDataPtr(newImage) < packedSized);
+		Image_ImageHeader const* levelHeader = Image_LinkedImageOf(image, i);
+		memcpy(dstPtr, Image_RawDataPtr(levelHeader), levelHeader->dataSize);
+		dstPtr += levelHeader->dataSize;
+	}
+
+	return newImage;
+}

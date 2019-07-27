@@ -147,10 +147,35 @@ AL2O3_EXTERN_C double Image_GetChannelAt(Image_ImageHeader const *image, Image_C
   }
 
 }
+AL2O3_EXTERN_C size_t Image_ByteCountOfImageChainOf(Image_ImageHeader const *image) {
+
+	size_t total = Image_ByteCountOf(image);
+
+	if(Image_HasPackedMipMaps(image)) {
+		return total;
+	}
+
+	switch (image->nextType) {
+	case Image_NT_MipMaps:
+	case Image_NT_Layers:
+		if (image->nextImage != NULL) {
+			total += Image_ByteCountOfImageChainOf(image->nextImage);
+		}
+		break;
+	default:
+	case Image_NT_None:break;
+	}
+
+	return total;
+}
 AL2O3_EXTERN_C size_t Image_LinkedImageCountOf(Image_ImageHeader const *image) {
   size_t count = 1;
 
-  while (image && image->nextImage != nullptr) {
+	if(Image_HasPackedMipMaps(image)) {
+		return image->packedMipMapCount;
+	}
+
+	while (image && image->nextImage != nullptr) {
     count++;
     image = image->nextImage;
   }
@@ -160,6 +185,10 @@ AL2O3_EXTERN_C size_t Image_LinkedImageCountOf(Image_ImageHeader const *image) {
 
 AL2O3_EXTERN_C Image_ImageHeader const *Image_LinkedImageOf(Image_ImageHeader const *image, size_t const index) {
   size_t count = 0;
+
+  if(index > 0) {
+		ASSERT(Image_HasPackedMipMaps(image) == false)
+	}
 
   do {
     if (count == index) {
@@ -303,7 +332,5 @@ AL2O3_EXTERN_C size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *i
 
     level--;
   }
-
   return size;
-
 }
