@@ -26,14 +26,14 @@ auto FetchHomoChannel_NORM(Image_Channel channel_, uint8_t const *ptr_) -> doubl
 }
 
 template<typename type_>
-auto FetchHomoChannel_sRGB(enum Image_Channel channel_, uint8_t const *ptr_) -> double {
+auto FetchHomoChannel_sRGB(Image_Channel channel_, uint8_t const *ptr_) -> double {
 	if(channel_ == -1) return 0.0;
 	if(channel_ == -2) return 1.0;
 
 	return Math_SRGB2Float(FetchRaw<type_>(ptr_ + sizeof(type_) * channel_));
 }
 
-auto FetchHomoChannel_nibble(enum Image_Channel channel_, uint8_t const *ptr_) -> double {
+auto FetchHomoChannel_nibble(Image_Channel channel_, uint8_t const *ptr_) -> double {
 	if(channel_ == -1) return 0.0;
 	if(channel_ == -2) return 15.0;
 
@@ -43,11 +43,11 @@ auto FetchHomoChannel_nibble(enum Image_Channel channel_, uint8_t const *ptr_) -
          ((bite >> 4) & 0xF);
 }
 
-auto FetchHomoChannel_nibble_UNORM(enum Image_Channel channel_, uint8_t const *ptr_) -> double {
+auto FetchHomoChannel_nibble_UNORM(Image_Channel channel_, uint8_t const *ptr_) -> double {
   return FetchHomoChannel_nibble(channel_, ptr_) / 15.0;
 }
 
-auto FetchChannel_R5G6B5_UNORM(enum Image_Channel channel_, uint8_t const *ptr_) -> double {
+auto FetchChannel_R5G6B5_UNORM(Image_Channel channel_, uint8_t const *ptr_) -> double {
 	if(channel_ == -1) return 0.0;
 	if(channel_ == -2) return 1.0;
 
@@ -61,18 +61,20 @@ auto FetchChannel_R5G6B5_UNORM(enum Image_Channel channel_, uint8_t const *ptr_)
   }
 }
 
-auto FetchChannel_R5G5B5A1_UNORM(enum Image_Channel channel_, uint8_t const *ptr_) -> double {
+auto FetchChannel_R5G5B5A1_UNORM(Image_Channel channel_, uint8_t const *ptr_) -> double {
 	if(channel_ == -1) return 0.0;
 	if(channel_ == -2) return 1.0;
 
 	uint16_t pixel = FetchRaw<uint16_t>(ptr_);
-  uint32_t x = 0;
-  if (channel_ == 0) { x = (pixel >> 11) & 0x1F; }
-  else if (channel_ == 1) { x = (pixel >> 6) & 0x1F; }
-  else if (channel_ == 2) { x = (pixel >> 1) & 0x1F; }
-  else if (channel_ == 3) { return ((double) ((pixel >> 0) & 0x1)); }
-  else { ASSERT((int) channel_ < 4); }
-  return ((double) (x)) / 31.0;
+
+	uint32_t x = 0;
+	if (channel_ == Image_Alpha) { return ((double) ((pixel >> 15) & 0x1)); }
+	else if (channel_ == Image_Red) { x = (pixel >> 0) & 0x1F; }
+	else if (channel_ == Image_Green) { x = (pixel >> 5) & 0x1F; }
+	else if (channel_ == Image_Blue) { x = (pixel >> 10) & 0x1F; }
+	else { ASSERT((int) channel_ < 4); }
+	return ((double) (x)) / 31.0;
+
 }
 
 auto FetchChannel_A1R5G5B5_UNORM(enum Image_Channel channel_, uint8_t const *ptr_) -> double {
@@ -80,14 +82,13 @@ auto FetchChannel_A1R5G5B5_UNORM(enum Image_Channel channel_, uint8_t const *ptr
 	if(channel_ == -2) return 1.0;
 
 	uint16_t pixel = FetchRaw<uint16_t>(ptr_);
-
-  uint32_t x = 0;
-  if (channel_ == 0) { return ((double) ((pixel >> 15) & 0x1)); }
-  else if (channel_ == 1) { x = (pixel >> 10) & 0x1F; }
-  else if (channel_ == 2) { x = (pixel >> 5) & 0x1F; }
-  else if (channel_ == 3) { x = (pixel >> 0) & 0x1F; }
-  else { ASSERT((int) channel_ < 4); }
-  return ((double) (x)) / 31.0;
+	uint32_t x = 0;
+	if (channel_ == Image_Red) { x = (pixel >> 11) & 0x1F; }
+	else if (channel_ == Image_Green) { x = (pixel >> 6) & 0x1F; }
+	else if (channel_ == Image_Blue) { x = (pixel >> 1) & 0x1F; }
+	else if (channel_ == Image_Alpha) { return ((double) ((pixel >> 0) & 0x1)); }
+	else { ASSERT((int) channel_ < 4); }
+	return ((double) (x)) / 31.0;
 }
 
 auto FetchHomoChannel_FP16(enum Image_Channel channel_, uint8_t const *ptr_) -> double {
@@ -396,11 +397,9 @@ auto BitWidth16ChannelAt(Image_Channel const channel_,
     	return FetchChannel_R5G6B5_UNORM(Image_Channel_Swizzle(fmt_, channel_), ptr_);
     case TinyImageFormat_R5G5B5A1_UNORM_PACK16:
     case TinyImageFormat_B5G5R5A1_UNORM_PACK16:
-      return FetchChannel_R5G5B5A1_UNORM(Image_Channel_Swizzle(fmt_, channel_),
-                                         ptr_);
+      return FetchChannel_R5G5B5A1_UNORM(Image_Channel_Swizzle(fmt_, channel_), ptr_);
     case TinyImageFormat_A1R5G5B5_UNORM_PACK16:
-      return FetchChannel_A1R5G5B5_UNORM(Image_Channel_Swizzle(fmt_, channel_),
-                                         ptr_);
+      return FetchChannel_A1R5G5B5_UNORM(Image_Channel_Swizzle(fmt_, channel_), ptr_);
 
     case TinyImageFormat_R8G8_UNORM:return FetchHomoChannel_NORM<uint8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
     case TinyImageFormat_R8G8_SNORM:return FetchHomoChannel_NORM<int8_t>(Image_Channel_Swizzle(fmt_, channel_), ptr_);
