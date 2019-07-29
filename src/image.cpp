@@ -249,16 +249,11 @@ AL2O3_EXTERN_C void Image_GetPixelAt(Image_ImageHeader const *image, Image_Pixel
 
   memset(pixel, 0, sizeof(Image_PixelD));
 
-  // intentional fallthrough on this switch statement
-  switch (TinyImageFormat_ChannelCount(image->format)) {
-    case 4:pixel->a = Image_GetChannelAt(image, Image_Alpha, index);
-    case 3:pixel->b = Image_GetChannelAt(image, Image_Blue, index);
-    case 2:pixel->g = Image_GetChannelAt(image, Image_Green, index);
-    case 1:pixel->r = Image_GetChannelAt(image, Image_Red, index);
-      break;
-    default:ASSERT(TinyImageFormat_ChannelCount(image->format) <= 4);
-      break;
-  }
+  // we rely on swizzle constants to fill in the channels that don't exist
+	pixel->a = Image_GetChannelAt(image, Image_Alpha, index);
+	pixel->b = Image_GetChannelAt(image, Image_Blue, index);
+	pixel->g = Image_GetChannelAt(image, Image_Green, index);
+	pixel->r = Image_GetChannelAt(image, Image_Red, index);
 }
 
 AL2O3_EXTERN_C void Image_SetPixelAt(Image_ImageHeader const *image, Image_PixelD const *pixel, size_t index) {
