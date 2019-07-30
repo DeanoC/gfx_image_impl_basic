@@ -73,18 +73,19 @@ auto PutChannel_5_6_5_UNORM(uint8_t channel_, uint8_t *ptr_, double const value_
 
 auto PutChannel_5_5_5_1_UNORM(uint8_t channel_, uint8_t *ptr_, double const value_) -> void {
   auto pixel = FetchRaw<uint16_t>(ptr_);
+
   if (channel_ == 0) {
     double const v = Math_ClampD(value_ * 31.0, 0.0, 31.0);
-    pixel = (pixel & ~0x001Fu) | ((uint16_t) v) << 0u;
+    pixel = (pixel & ~0x001Fu) | ((uint16_t) round(v)) << 0u;
   } else if (channel_ == 1) {
     double const v = Math_ClampD(value_ * 31.0, 0.0, 31.0);
-    pixel = (pixel & ~0x03E0u) | ((uint16_t) v) << 5u;
+    pixel = (pixel & ~0x03E0u) | ((uint16_t) round(v)) << 5u;
   } else if (channel_ == 2) {
     double const v = Math_ClampD(value_ * 31.0, 0.0, 31.0);
-    pixel = (pixel & ~0x7C00u) | ((uint16_t) v) << 10u;
+    pixel = (pixel & ~0x7C00u) | ((uint16_t) round(v)) << 10u;
   } else if (channel_ == 3) {
     double const v = Math_ClampD(value_, 0.0, 1.0);
-    pixel = (pixel & ~0x8000) | (uint16_t) v << 15u;
+    pixel = (pixel & ~0x8000) | ((uint16_t) round(v)) << 15u;
   } else {
     ASSERT(channel_ < 4);
   }
