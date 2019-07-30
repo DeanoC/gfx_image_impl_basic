@@ -202,7 +202,7 @@ return nullptr;
 }
 
 AL2O3_EXTERN_C void Image_SetChannelAt(Image_ImageHeader const *image,
-                                 enum Image_Channel channel,
+                                 Image_Channel channel,
                                  size_t index,
                                  double value) {
   using namespace Image;
@@ -210,7 +210,13 @@ AL2O3_EXTERN_C void Image_SetChannelAt(Image_ImageHeader const *image,
   // block compressed not handled ye
   ASSERT(!TinyImageFormat_IsCompressed(image->format));
 
-  // split into bit width grouped formats
+	if(channel < 0) {
+		LOGERRORF("Channel must be RED, GREEN, BLUE or ALPHA");
+		return;
+	}
+
+
+		// split into bit width grouped formats
   uint32_t const pixelSize = TinyImageFormat_BitSize(image->format);
   ASSERT(pixelSize >= 8);
   uint8_t *pixelPtr = (uint8_t *) Image_RawDataPtr(image) + (index * pixelSize / 8);
