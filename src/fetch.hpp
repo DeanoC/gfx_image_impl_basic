@@ -49,10 +49,8 @@ auto FetchHomoChannel_nibble(int8_t channel_, uint8_t const *ptr_) -> double {
 	if (channel_ == -2)
 		return 15.0;
 
-	uint8_t bite = *(ptr_ + ((int) channel_ / 2));
-	return (double) ((channel_ & 0x1) ?
-									 ((bite >> 0) & 0xF) :
-									 ((bite >> 4) & 0xF));
+	uint8_t const bite = *(ptr_ + ((int) channel_ / 2));
+	return (double) ((channel_ & 0x1) ?	((bite >> 0) & 0xF) :	((bite >> 4) & 0xF));
 }
 
 auto FetchHomoChannel_nibble_UNORM(int8_t channel_, uint8_t const *ptr_) -> double {
@@ -67,14 +65,14 @@ auto FetchChannel_5_6_5_UNORM(int8_t channel_, uint8_t const *ptr_) -> double {
 
 	uint16_t pixel = FetchRaw<uint16_t>(ptr_);
 	if (channel_ == 0) {
-		return ((double) ((pixel >> 11) & 0x1F)) / 31.0;
+		return ((double) ((pixel >> 0) & 0x1F)) / 31.0;
 	} else if (channel_ == 1) {
 		return ((double) ((pixel >> 5) & 0x3F)) / 63.0;
 	} else if (channel_ == 2) {
-		return ((double) ((pixel >> 0) & 0x1F)) / 31.0;
-	} else {
-		return 0.0;
+		return ((double) ((pixel >> 11) & 0x1F)) / 31.0;
 	}
+
+	return 0.0;
 }
 
 auto FetchChannel_5_5_5_1_UNORM(int8_t channel_, uint8_t const *ptr_) -> double {
@@ -86,14 +84,14 @@ auto FetchChannel_5_5_5_1_UNORM(int8_t channel_, uint8_t const *ptr_) -> double 
 	uint16_t pixel = FetchRaw<uint16_t>(ptr_);
 
 	uint32_t x = 0;
-	if (channel_ == Image_Alpha) {
-		return ((double) ((pixel >> 15) & 0x1));
-	} else if (channel_ == Image_Red) {
+	if (channel_ == 0) {
 		x = (pixel >> 0) & 0x1F;
-	} else if (channel_ == Image_Green) {
+	} else if (channel_ == 1) {
 		x = (pixel >> 5) & 0x1F;
-	} else if (channel_ == Image_Blue) {
+	} else if (channel_ == 2) {
 		x = (pixel >> 10) & 0x1F;
+	} else	if (channel_ == 3) {
+		return ((double) ((pixel >> 15) & 0x1));
 	}
 
 	return ((double) (x)) / 31.0;
@@ -143,11 +141,11 @@ auto FetchChannel_2_10_10_10(int8_t channel_, uint8_t const *ptr_) -> double {
 	if (channel_ == 0) {
 		return ((double) ((pixel >> 30) & 0x3));
 	} else if (channel_ == 1) {
-		x = (pixel >> 20) & 0x3FF;
+		x = (pixel >> 0) & 0x3FF;
 	} else if (channel_ == 2) {
 		x = (pixel >> 10) & 0x3FF;
 	} else if (channel_ == 3) {
-		x = (pixel >> 0) & 0x3FF;
+		x = (pixel >> 20) & 0x3FF;
 	}
 
 	return ((double) (x));
@@ -305,10 +303,8 @@ auto BitWidth64ChannelAt(Image_Channel const channel_,
 	case TinyImageFormat_R16G16B16A16_SNORM:
 		return FetchHomoChannel_NORM<int16_t>(SWIZ, ptr_);
 	case TinyImageFormat_R16G16B16A16_UINT:
-	case TinyImageFormat_R16G16B16A16_USCALED:
 		return FetchHomoChannel<uint16_t>(SWIZ, ptr_);
 	case TinyImageFormat_R16G16B16A16_SINT:
-	case TinyImageFormat_R16G16B16A16_SSCALED:
 		return FetchHomoChannel<int16_t>(SWIZ, ptr_);
 	case TinyImageFormat_R16G16B16A16_SFLOAT:
 		return FetchHomoChannel_FP16(SWIZ, ptr_);
@@ -328,10 +324,11 @@ auto BitWidth48ChannelAt(Image_Channel const channel_,
 	case TinyImageFormat_R16G16B16_SNORM:
 		return FetchHomoChannel_NORM<int16_t>(SWIZ, ptr_);
 	case TinyImageFormat_R16G16B16_UINT:
-	case TinyImageFormat_R16G16B16_USCALED:return FetchHomoChannel<uint16_t>(SWIZ, ptr_);
+		return FetchHomoChannel<uint16_t>(SWIZ, ptr_);
 	case TinyImageFormat_R16G16B16_SINT:
-	case TinyImageFormat_R16G16B16_SSCALED:return FetchHomoChannel<int16_t>(SWIZ, ptr_);
-	case TinyImageFormat_R16G16B16_SFLOAT:return FetchHomoChannel_FP16(SWIZ, ptr_);
+		return FetchHomoChannel<int16_t>(SWIZ, ptr_);
+	case TinyImageFormat_R16G16B16_SFLOAT:
+		return FetchHomoChannel_FP16(SWIZ, ptr_);
 
 	default:LOGERRORF("%s not handled by bitWidth48ChannelAt", TinyImageFormat_Name(fmt_));
 		return 0.0;
@@ -349,45 +346,31 @@ auto BitWidth32ChannelAt(Image_Channel const channel_,
 	case TinyImageFormat_R16G16_UNORM:return FetchHomoChannel_NORM<uint16_t>(SWIZ, ptr_);
 	case TinyImageFormat_R16G16_SNORM:return FetchHomoChannel_NORM<int16_t>(SWIZ, ptr_);
 	case TinyImageFormat_R16G16_UINT:
-	case TinyImageFormat_R16G16_USCALED:return FetchHomoChannel<uint16_t>(SWIZ, ptr_);
+		return FetchHomoChannel<uint16_t>(SWIZ, ptr_);
 	case TinyImageFormat_R16G16_SINT:
-	case TinyImageFormat_R16G16_SSCALED:return FetchHomoChannel<int16_t>(SWIZ, ptr_);
+		return FetchHomoChannel<int16_t>(SWIZ, ptr_);
 	case TinyImageFormat_R16G16_SFLOAT:return FetchHomoChannel_FP16(SWIZ, ptr_);
 
 	case TinyImageFormat_R8G8B8A8_UNORM:
 	case TinyImageFormat_B8G8R8A8_UNORM:
-	case TinyImageFormat_A8B8G8R8_UNORM_PACK32:
-	case TinyImageFormat_A8R8G8B8_UNORM_PACK32:
 		return FetchHomoChannel_NORM<uint8_t>(SWIZ, ptr_);
 	case TinyImageFormat_R8G8B8A8_SNORM:
 	case TinyImageFormat_B8G8R8A8_SNORM:
-	case TinyImageFormat_A8B8G8R8_SNORM_PACK32:
 		return FetchHomoChannel_NORM<int8_t>(SWIZ, ptr_);
-	case TinyImageFormat_R8G8B8A8_USCALED:
 	case TinyImageFormat_R8G8B8A8_UINT:
-	case TinyImageFormat_B8G8R8A8_USCALED:
 	case TinyImageFormat_B8G8R8A8_UINT:
-	case TinyImageFormat_A8B8G8R8_USCALED_PACK32:
-	case TinyImageFormat_A8B8G8R8_UINT_PACK32:
 		return FetchHomoChannel<uint8_t>(SWIZ, ptr_);
-	case TinyImageFormat_R8G8B8A8_SSCALED:
 	case TinyImageFormat_R8G8B8A8_SINT:
-	case TinyImageFormat_B8G8R8A8_SSCALED:
 	case TinyImageFormat_B8G8R8A8_SINT:
-	case TinyImageFormat_A8B8G8R8_SSCALED_PACK32:
-	case TinyImageFormat_A8B8G8R8_SINT_PACK32:
 		return FetchHomoChannel<int8_t>(SWIZ, ptr_);
 	case TinyImageFormat_R8G8B8A8_SRGB:
 	case TinyImageFormat_B8G8R8A8_SRGB:
-	case TinyImageFormat_A8B8G8R8_SRGB_PACK32:
 		return FetchHomoChannel_sRGB<uint8_t>(SWIZ, ptr_);
 
 	case TinyImageFormat_A2R10G10B10_UNORM_PACK32:
 	case TinyImageFormat_A2B10G10R10_UNORM_PACK32:
 		return FetchChannel_2_10_10_10_UNORM(SWIZ, ptr_);
-	case TinyImageFormat_A2R10G10B10_USCALED_PACK32:
 	case TinyImageFormat_A2R10G10B10_UINT_PACK32:
-	case TinyImageFormat_A2B10G10R10_USCALED_PACK32:
 	case TinyImageFormat_A2B10G10R10_UINT_PACK32:
 		return FetchChannel_2_10_10_10(SWIZ, ptr_);
 	case TinyImageFormat_X8_D24_UNORM_PACK32:return FetchChannel_8_24_UINT_UNORM(SWIZ, ptr_);
@@ -409,13 +392,9 @@ auto BitWidth24ChannelAt(Image_Channel const channel_,
 	case TinyImageFormat_B8G8R8_UNORM: return FetchHomoChannel_NORM<uint8_t>(SWIZ, ptr_);
 	case TinyImageFormat_R8G8B8_SNORM:
 	case TinyImageFormat_B8G8R8_SNORM: return FetchHomoChannel_NORM<int8_t>(SWIZ, ptr_);
-	case TinyImageFormat_R8G8B8_USCALED:
 	case TinyImageFormat_R8G8B8_UINT:
-	case TinyImageFormat_B8G8R8_USCALED:
 	case TinyImageFormat_B8G8R8_UINT: return FetchHomoChannel<uint8_t>(SWIZ, ptr_);
-	case TinyImageFormat_R8G8B8_SSCALED:
 	case TinyImageFormat_R8G8B8_SINT:
-	case TinyImageFormat_B8G8R8_SSCALED:
 	case TinyImageFormat_B8G8R8_SINT: return FetchHomoChannel<int8_t>(SWIZ, ptr_);
 	case TinyImageFormat_R8G8B8_SRGB:
 	case TinyImageFormat_B8G8R8_SRGB: return FetchHomoChannel_sRGB<uint8_t>(SWIZ, ptr_);
@@ -446,18 +425,16 @@ auto BitWidth16ChannelAt(Image_Channel const channel_,
 
 	case TinyImageFormat_R8G8_UNORM:return FetchHomoChannel_NORM<uint8_t>(SWIZ, ptr_);
 	case TinyImageFormat_R8G8_SNORM:return FetchHomoChannel_NORM<int8_t>(SWIZ, ptr_);
-	case TinyImageFormat_R8G8_USCALED:
 	case TinyImageFormat_R8G8_UINT:return FetchHomoChannel<uint8_t>(SWIZ, ptr_);
-	case TinyImageFormat_R8G8_SSCALED:
 	case TinyImageFormat_R8G8_SINT:return FetchHomoChannel<int8_t>(SWIZ, ptr_);
 	case TinyImageFormat_R8G8_SRGB:return FetchHomoChannel_sRGB<uint8_t>(SWIZ, ptr_);
 	case TinyImageFormat_D16_UNORM:
 	case TinyImageFormat_R16_UNORM:return FetchHomoChannel_NORM<uint16_t>(SWIZ, ptr_);
 	case TinyImageFormat_R16_SNORM:return FetchHomoChannel_NORM<int16_t>(SWIZ, ptr_);
 	case TinyImageFormat_R16_UINT:
-	case TinyImageFormat_R16_USCALED:return FetchHomoChannel<uint16_t>(SWIZ, ptr_);
+		return FetchHomoChannel<uint16_t>(SWIZ, ptr_);
 	case TinyImageFormat_R16_SINT:
-	case TinyImageFormat_R16_SSCALED:return FetchHomoChannel<int16_t>(SWIZ, ptr_);
+		return FetchHomoChannel<int16_t>(SWIZ, ptr_);
 	case TinyImageFormat_R16_SFLOAT:return FetchHomoChannel_FP16(SWIZ, ptr_);
 	default:LOGERRORF("%s not handled by bitWidth16ChannelAt", TinyImageFormat_Name(fmt_));
 		return 0.0;
@@ -474,9 +451,7 @@ auto BitWidth8ChannelAt(Image_Channel const channel_,
 	case TinyImageFormat_R8_UNORM: return FetchHomoChannel_NORM<uint8_t>(SWIZ, ptr_);
 	case TinyImageFormat_R8_SNORM: return FetchHomoChannel_NORM<int8_t>(SWIZ, ptr_);
 	case TinyImageFormat_S8_UINT:
-	case TinyImageFormat_R8_USCALED:
 	case TinyImageFormat_R8_UINT: return FetchHomoChannel<uint8_t>(SWIZ, ptr_);
-	case TinyImageFormat_R8_SSCALED:
 	case TinyImageFormat_R8_SINT: return FetchHomoChannel<int8_t>(SWIZ, ptr_);
 	case TinyImageFormat_R8_SRGB: return FetchHomoChannel_sRGB<uint8_t>(SWIZ, ptr_);
 

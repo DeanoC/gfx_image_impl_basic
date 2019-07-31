@@ -261,8 +261,6 @@ void BuildImageConvertTables() {
   FDT(s##_SNORM, d##_SNORM, f, i); \
   FDT(s##_UINT, d##_UINT, f, i); \
   FDT(s##_SINT, d##_SINT, f, i); \
-  FDT(s##_USCALED, d##_USCALED, f, i); \
-  FDT(s##_SSCALED, d##_SSCALED, f, i); \
   FDT(s##_SRGB, d##_SRGB, f, i);
 
 #define FDT_ITOF(t, s, d, n1, n2, inplace) \
@@ -275,8 +273,6 @@ void BuildImageConvertTables() {
   FDT_ITOF(t, s##_SNORM, d##_SFLOAT, n1, n2, (w*n1) <= (32*n2)) \
   FDT_ITOF(t, s##_UINT, d##_SFLOAT, n1, n2, (w*n1) <= (32*n2)) \
   FDT_ITOF(t, s##_SINT, d##_SFLOAT, n1, n2, (w*n1) <= (32*n2)) \
-  FDT_ITOF(t, s##_USCALED, d##_SFLOAT, n1, n2, (w*n1) <= (32*n2)) \
-  FDT_ITOF(t, s##_SSCALED, d##_SFLOAT, n1, n2, (w*n1) <= (32*n2))
 
 #define FDT_ITOF_WIDTH_SET(w) \
   FDT_ITOF_SET(uint##w##_t, R##w, R32, 1, 1, w) \
