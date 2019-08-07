@@ -1,6 +1,5 @@
 #include "al2o3_platform/platform.h"
-#include "tiny_imageformat/format.h"
-#include "tiny_imageformat/formatcracker.h"
+#include "tiny_imageformat/tinyimageformat.h"
 #include "gfx_image/image.h"
 #include "gfx_image/create.h"
 

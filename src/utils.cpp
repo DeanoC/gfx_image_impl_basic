@@ -1,7 +1,6 @@
 #include "al2o3_platform/platform.h"
 #include "al2o3_memory/memory.h"
-#include "tiny_imageformat/format.h"
-#include "tiny_imageformat/formatcracker.h"
+#include "tiny_imageformat/tinyimageformat.h"
 #include "gfx_image/image.h"
 #include "gfx_image/utils.h"
 #include "hq_resample.hpp"
@@ -14,8 +13,8 @@ AL2O3_EXTERN_C bool Image_GetColorRangeOf(Image_ImageHeader const *src, Image_Pi
 	double *minData = &omin->r;
 	double *maxData = &omax->r;
 	for (uint32_t i = 0u; i < TinyImageFormat_ChannelCount(src->format); ++i) {
-		minData[i] = TinyImageFormat_Max(src->format, i);
-		maxData[i] = TinyImageFormat_Min(src->format, i);
+		minData[i] = TinyImageFormat_MaxAtPhysical(src->format, i);
+		maxData[i] = TinyImageFormat_MinAtPhysical(src->format, i);
 	};
 
 	for (auto w = 0u; w < src->slices; ++w) {

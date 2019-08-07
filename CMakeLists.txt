@@ -27,6 +27,8 @@ set(Src
 		)
 
 set(Deps
+		al2o3_platform
+		al2o3_cmath
 		gfx_image_interface
 		tiny_imageformat
 		al2o3_memory
@@ -38,5 +40,7 @@ set( Tests
 		test_pixel.cpp
 		)
 set( TestDeps
-		al2o3_catch2 )
+		al2o3_catch2
+		utils_simple_logmanager
+		)
 ADD_LIB_TESTS(${BaseInterfaceName}_impl_${ImplName} "${Interface}" "${Tests}" "${TestDeps}")

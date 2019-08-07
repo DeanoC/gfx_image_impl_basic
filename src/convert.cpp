@@ -1,6 +1,5 @@
 #include "al2o3_platform/platform.h"
-#include "tiny_imageformat/format.h"
-#include "tiny_imageformat/formatcracker.h"
+#include "tiny_imageformat/tinyimageformat.h"
 #include "gfx_image/image.h"
 #include "gfx_image/utils.h"
 
@@ -238,13 +237,13 @@ IntegerTypeToFloat(int32_t);
 #undef IntegerTypeToFloat
 
 bool g_imageConvertTablesBuild = false;
-bool g_imageConvertCanInPlace[TinyImageFormat_Count()][TinyImageFormat_Count()];
-ImageConvertFunc g_imageConvertDDTable[TinyImageFormat_Count()][TinyImageFormat_Count()];
-ImageConvertOutOfPlaceFunc g_imageConvertOutOfPlaceDDTable[TinyImageFormat_Count()][TinyImageFormat_Count()];
+bool g_imageConvertCanInPlace[TinyImageFormat_Count][TinyImageFormat_Count];
+ImageConvertFunc g_imageConvertDDTable[TinyImageFormat_Count][TinyImageFormat_Count];
+ImageConvertOutOfPlaceFunc g_imageConvertOutOfPlaceDDTable[TinyImageFormat_Count][TinyImageFormat_Count];
 
 void BuildImageConvertTables() {
-  for (auto i = 0u; i < (unsigned int)TinyImageFormat_Count(); ++i) {
-    for (auto j = 0u; j < (unsigned int)TinyImageFormat_Count(); ++j) {
+  for (auto i = 0u; i < (unsigned int)TinyImageFormat_Count; ++i) {
+    for (auto j = 0u; j < (unsigned int)TinyImageFormat_Count; ++j) {
       g_imageConvertCanInPlace[i][j] = false;
       g_imageConvertDDTable[i][j] = &SlowImageConvert;
       g_imageConvertOutOfPlaceDDTable[i][j] = &SlowImageConvertOutOfPlace;

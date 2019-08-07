@@ -1,6 +1,5 @@
 #include "al2o3_platform/platform.h"
-#include "tiny_imageformat/format.h"
-#include "tiny_imageformat/formatcracker.h"
+#include "tiny_imageformat/tinyimageformat.h"
 #include "gfx_image/image.h"
 #include "al2o3_memory/memory.h"
 
@@ -46,25 +45,23 @@ AL2O3_EXTERN_C void Image_FillHeader(uint32_t width,
                                Image_ImageHeader *header) {
 
 
-  if(TinyImageFormat_IsCompressed(format)) {
-  	uint32_t const blockW = TinyImageFormat_WidthOfBlock(format);
-		uint32_t const blockH = TinyImageFormat_HeightOfBlock(format);
+	uint32_t const blockW = TinyImageFormat_WidthOfBlock(format);
+	uint32_t const blockH = TinyImageFormat_HeightOfBlock(format);
+	uint32_t const blockD = TinyImageFormat_DepthOfBlock(format);
 
-		// smallest sized a block compressed texture can have is hte block size
-		width = Math_MaxU32(width, blockW);
-		height = Math_MaxU32(height, blockH);
+	// smallest sized a block compressed texture can have is hte block size
+	width = Math_MaxU32(width, blockW);
+	height = Math_MaxU32(height, blockH);
+	depth = Math_MaxU32(depth, blockD);
 
-		// round up to block size
-  	width = (width + (blockW-1)) & ~(blockW-1);
-		height = (height + (blockH-1)) & ~(blockH-1);
+	// round up to block size
+	width = (width + (blockW-1)) & ~(blockW-1);
+	height = (height + (blockH-1)) & ~(blockH-1);
+	depth = (depth + (blockD-1)) & ~(blockD-1);
 
-		uint64_t const pixelCount = (uint64_t)width * (uint64_t)height * (uint64_t)depth * (uint64_t)slices;
-		uint32_t const blockBitSize = TinyImageFormat_BitSizeOfBlock(format);
-		header->dataSize = (pixelCount * (uint64_t)blockBitSize) / ((uint64_t)blockW * (uint64_t)blockH * 8ULL);
-	} else {
-		uint64_t const pixelCount = (uint64_t)width * (uint64_t)height * (uint64_t)depth * (uint64_t)slices;
-		header->dataSize = (pixelCount * (uint64_t)TinyImageFormat_BitSize(format)) / 8ULL;
-  }
+	uint64_t const pixelCount = (uint64_t)width * (uint64_t)height * (uint64_t)depth * (uint64_t)slices;
+	uint32_t const blockBitSize = TinyImageFormat_BitSizeOfPixelOrBlock(format);
+	header->dataSize = (pixelCount * (uint64_t)blockBitSize) / ((uint64_t)blockW * (uint64_t)blockH * (uint64_t)blockD * 8ULL);
 
   header->width = width;
 	header->height = height;
@@ -105,18 +102,10 @@ AL2O3_EXTERN_C void Image_Destroy(Image_ImageHeader const *image) {
   MEMORY_FREE((Image_ImageHeader*)image);
 }
 
-// we include fetch after swizzle so hopefully the compiler will inline it...
-AL2O3_EXTERN_C inline enum Image_Channel Image_Channel_Swizzle(enum TinyImageFormat format, Image_Channel channel) {
-	if(channel < 0) return channel;
-
-  Image_Swizzle swizzler = TinyImageFormat_Swizzle(format);
-  return (Image_Channel) swizzler[channel];
-}
-
 #include "fetch.hpp"
 #include "put.hpp"
 
-AL2O3_EXTERN_C double Image_GetChannelAt(Image_ImageHeader const *image, Image_Channel channel, size_t index) {
+AL2O3_EXTERN_C double Image_GetChannelAt(Image_ImageHeader const *image, TinyImageFormat_LogicalChannel channel, size_t index) {
   ASSERT(image);
 
   using namespace Image;
@@ -125,13 +114,13 @@ AL2O3_EXTERN_C double Image_GetChannelAt(Image_ImageHeader const *image, Image_C
     return Image::CompressedChannelAt(image, channel, index);
   }
 
-  // split into bit width grouped formats
-  ASSERT(TinyImageFormat_BitSize(image->format) >= 8);
+	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
+			index * (TinyImageFormat_BitSizeOfPixelOrBlock(image->format) / 8);
 
-  uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
-      index * (TinyImageFormat_BitSize(image->format) / 8);
+	// split into bit width grouped formats
+	ASSERT(TinyImageFormat_BitSizeOfPixelOrBlock(image->format) >= 8);
 
-  switch (TinyImageFormat_BitSize(image->format)) {
+	switch (TinyImageFormat_BitSizeOfPixelOrBlock(image->format)) {
     case 256:return BitWidth256ChannelAt(channel, image->format, pixelPtr);
     case 192:return BitWidth192ChannelAt(channel, image->format, pixelPtr);
     case 128:return BitWidth128ChannelAt(channel, image->format, pixelPtr);
@@ -202,7 +191,7 @@ return nullptr;
 }
 
 AL2O3_EXTERN_C void Image_SetChannelAt(Image_ImageHeader const *image,
-                                 Image_Channel channel,
+                                 TinyImageFormat_LogicalChannel channel,
                                  size_t index,
                                  double value) {
   using namespace Image;
@@ -217,7 +206,7 @@ AL2O3_EXTERN_C void Image_SetChannelAt(Image_ImageHeader const *image,
 
 
 		// split into bit width grouped formats
-  uint32_t const pixelSize = TinyImageFormat_BitSize(image->format);
+  uint32_t const pixelSize = TinyImageFormat_BitSizeOfPixelOrBlock(image->format);
   ASSERT(pixelSize >= 8);
   uint8_t *pixelPtr = (uint8_t *) Image_RawDataPtr(image) + (index * pixelSize / 8);
 
@@ -243,7 +232,7 @@ AL2O3_EXTERN_C void Image_SetChannelAt(Image_ImageHeader const *image,
     case 8:BitWidth8SetChannelAt(channel, image->format, pixelPtr, value);
       break;
     default:LOGERRORF("Bitwidth %i from %s not supported",
-                      TinyImageFormat_BitSize(image->format),
+											TinyImageFormat_BitSizeOfPixelOrBlock(image->format),
                       TinyImageFormat_Name(image->format));
   }
 
@@ -253,13 +242,20 @@ AL2O3_EXTERN_C void Image_GetPixelAt(Image_ImageHeader const *image, Image_Pixel
   ASSERT(image);
   ASSERT(pixel);
 
-  memset(pixel, 0, sizeof(Image_PixelD));
+	memset(pixel, 0, sizeof(Image_PixelD));
 
-  // we rely on swizzle constants to fill in the channels that don't exist
-	pixel->a = Image_GetChannelAt(image, Image_Alpha, index);
-	pixel->b = Image_GetChannelAt(image, Image_Blue, index);
-	pixel->g = Image_GetChannelAt(image, Image_Green, index);
-	pixel->r = Image_GetChannelAt(image, Image_Red, index);
+	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
+			index * (TinyImageFormat_BitSizeOfPixelOrBlock(image->format) / 8);
+
+	// TinyImageFormat
+	TinyImageFormat_FetchLogicalPixel(image->format, pixelPtr, &pixel->r);
+	return;
+
+	// we rely on swizzle constants to fill in the channels that don't exist
+	pixel->a = Image_GetChannelAt(image, TinyImageFormat_LC_Alpha, index);
+	pixel->b = Image_GetChannelAt(image, TinyImageFormat_LC_Blue, index);
+	pixel->g = Image_GetChannelAt(image, TinyImageFormat_LC_Green, index);
+	pixel->r = Image_GetChannelAt(image, TinyImageFormat_LC_Red, index);
 }
 
 AL2O3_EXTERN_C void Image_SetPixelAt(Image_ImageHeader const *image, Image_PixelD const *pixel, size_t index) {
@@ -268,10 +264,10 @@ AL2O3_EXTERN_C void Image_SetPixelAt(Image_ImageHeader const *image, Image_Pixel
 
   // intentional fallthrough on this switch statement
   switch (TinyImageFormat_ChannelCount(image->format)) {
-    case 4: Image_SetChannelAt(image, Image_Alpha, index, pixel->a);
-    case 3: Image_SetChannelAt(image, Image_Blue, index, pixel->b);
-    case 2: Image_SetChannelAt(image, Image_Green, index, pixel->g);
-    case 1: Image_SetChannelAt(image, Image_Red, index, pixel->r);
+    case 4: Image_SetChannelAt(image, TinyImageFormat_LC_Alpha, index, pixel->a);
+    case 3: Image_SetChannelAt(image, TinyImageFormat_LC_Blue, index, pixel->b);
+    case 2: Image_SetChannelAt(image, TinyImageFormat_LC_Green, index, pixel->g);
+    case 1: Image_SetChannelAt(image, TinyImageFormat_LC_Red, index, pixel->r);
       break;
     default:ASSERT(TinyImageFormat_ChannelCount(image->format) <= 4);
       break;
@@ -283,25 +279,23 @@ AL2O3_EXTERN_C size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *i
   int const maxMipLevels =
       Math_Log2(Math_MaxI32(image->depth,
                             Math_MaxI32(image->width, image->height)));
-  uint32_t minWidth = 1;
-  uint32_t minHeight = 1;
-  uint32_t minDepth = 1;
-  if (TinyImageFormat_IsCompressed(image->format)) {
-    minWidth = TinyImageFormat_WidthOfBlock(image->format);
-    minHeight = TinyImageFormat_HeightOfBlock(image->format);
-  }
+  uint32_t minWidth = TinyImageFormat_WidthOfBlock(image->format);
+  uint32_t minHeight = TinyImageFormat_HeightOfBlock(image->format);
+  uint32_t minDepth = TinyImageFormat_DepthOfBlock(image->format);
 
   switch (image->format) {
-    case TinyImageFormat_PVR_4BPP_UNORM_BLOCK:
-    case TinyImageFormat_PVR_4BPPA_UNORM_BLOCK:
-    case TinyImageFormat_PVR_4BPP_SRGB_BLOCK:
-    case TinyImageFormat_PVR_4BPPA_SRGB_BLOCK:minWidth = 8;
+    case TinyImageFormat_PVRTC1_4BPP_UNORM:
+    case TinyImageFormat_PVRTC1_4BPP_SRGB:
+		case TinyImageFormat_PVRTC2_4BPP_UNORM:
+		case TinyImageFormat_PVRTC2_4BPP_SRGB:
+    	minWidth = 8;
       minHeight = 8;
       break;
-    case TinyImageFormat_PVR_2BPP_UNORM_BLOCK:
-    case TinyImageFormat_PVR_2BPPA_UNORM_BLOCK:
-    case TinyImageFormat_PVR_2BPP_SRGB_BLOCK:
-    case TinyImageFormat_PVR_2BPPA_SRGB_BLOCK:minWidth = 16;
+    case TinyImageFormat_PVRTC1_2BPP_UNORM:
+    case TinyImageFormat_PVRTC1_2BPP_SRGB:
+		case TinyImageFormat_PVRTC2_2BPP_UNORM:
+		case TinyImageFormat_PVRTC2_2BPP_SRGB:
+    	minWidth = 16;
       minHeight = 8;
       break;
     default:break;
