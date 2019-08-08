@@ -60,7 +60,7 @@ AL2O3_EXTERN_C void Image_FillHeader(uint32_t width,
 	depth = (depth + (blockD-1)) & ~(blockD-1);
 
 	uint64_t const pixelCount = (uint64_t)width * (uint64_t)height * (uint64_t)depth * (uint64_t)slices;
-	uint32_t const blockBitSize = TinyImageFormat_BitSizeOfPixelOrBlock(format);
+	uint32_t const blockBitSize = TinyImageFormat_BitSizeOfBlock(format);
 	header->dataSize = (pixelCount * (uint64_t)blockBitSize) / ((uint64_t)blockW * (uint64_t)blockH * (uint64_t)blockD * 8ULL);
 
   header->width = width;
@@ -87,55 +87,18 @@ AL2O3_EXTERN_C Image_ImageHeader const* Image_CreateHeaderOnly(	uint32_t width,
 
 AL2O3_EXTERN_C void Image_Destroy(Image_ImageHeader const *image) {
 	if(!image) return;
-  // recursively free next chain
-  switch (image->nextType) {
-    case Image_NT_MipMaps:
-    case Image_NT_Layers: {
-      if (image->nextImage != nullptr) {
-        Image_Destroy(image->nextImage);
-      }
-    }
-      break;
-    default:
-    case Image_NT_None:break;
-  }
+
+	// recursively free next in image chain
+  if(image->nextType != Image_NT_None) {
+		Image_Destroy(image->nextImage);
+	}
+
   MEMORY_FREE((Image_ImageHeader*)image);
 }
 
-#include "fetch.hpp"
+//#include "fetch.hpp"
 #include "put.hpp"
 
-AL2O3_EXTERN_C double Image_GetChannelAt(Image_ImageHeader const *image, TinyImageFormat_LogicalChannel channel, size_t index) {
-  ASSERT(image);
-
-  using namespace Image;
-  // seperate out the block compressed format first
-  if (TinyImageFormat_IsCompressed(image->format)) {
-    return Image::CompressedChannelAt(image, channel, index);
-  }
-
-	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
-			index * (TinyImageFormat_BitSizeOfPixelOrBlock(image->format) / 8);
-
-	// split into bit width grouped formats
-	ASSERT(TinyImageFormat_BitSizeOfPixelOrBlock(image->format) >= 8);
-
-	switch (TinyImageFormat_BitSizeOfPixelOrBlock(image->format)) {
-    case 256:return BitWidth256ChannelAt(channel, image->format, pixelPtr);
-    case 192:return BitWidth192ChannelAt(channel, image->format, pixelPtr);
-    case 128:return BitWidth128ChannelAt(channel, image->format, pixelPtr);
-    case 96:return BitWidth96ChannelAt(channel, image->format, pixelPtr);
-    case 64:return BitWidth64ChannelAt(channel, image->format, pixelPtr);
-    case 48:return BitWidth48ChannelAt(channel, image->format, pixelPtr);
-    case 32:return BitWidth32ChannelAt(channel, image->format, pixelPtr);
-    case 24:return BitWidth24ChannelAt(channel, image->format, pixelPtr);
-    case 16:return BitWidth16ChannelAt(channel, image->format, pixelPtr);
-    case 8:return BitWidth8ChannelAt(channel, image->format, pixelPtr);
-    default:LOGERROR("Bitwidth of format not supported");
-      return 0.0;
-  }
-
-}
 AL2O3_EXTERN_C size_t Image_ByteCountOfImageChainOf(Image_ImageHeader const *image) {
 
 	size_t total = Image_ByteCountOf(image);
@@ -144,15 +107,8 @@ AL2O3_EXTERN_C size_t Image_ByteCountOfImageChainOf(Image_ImageHeader const *ima
 		return total;
 	}
 
-	switch (image->nextType) {
-	case Image_NT_MipMaps:
-	case Image_NT_Layers:
-		if (image->nextImage != NULL) {
-			total += Image_ByteCountOfImageChainOf(image->nextImage);
-		}
-		break;
-	default:
-	case Image_NT_None:break;
+	if(image->nextType != Image_NT_None && image->nextImage != nullptr) {
+		total += Image_ByteCountOfImageChainOf(image->nextImage);
 	}
 
 	return total;
@@ -206,7 +162,7 @@ AL2O3_EXTERN_C void Image_SetChannelAt(Image_ImageHeader const *image,
 
 
 		// split into bit width grouped formats
-  uint32_t const pixelSize = TinyImageFormat_BitSizeOfPixelOrBlock(image->format);
+  uint32_t const pixelSize = TinyImageFormat_BitSizeOfBlock(image->format);
   ASSERT(pixelSize >= 8);
   uint8_t *pixelPtr = (uint8_t *) Image_RawDataPtr(image) + (index * pixelSize / 8);
 
@@ -232,7 +188,7 @@ AL2O3_EXTERN_C void Image_SetChannelAt(Image_ImageHeader const *image,
     case 8:BitWidth8SetChannelAt(channel, image->format, pixelPtr, value);
       break;
     default:LOGERRORF("Bitwidth %i from %s not supported",
-											TinyImageFormat_BitSizeOfPixelOrBlock(image->format),
+											TinyImageFormat_BitSizeOfBlock(image->format),
                       TinyImageFormat_Name(image->format));
   }
 
@@ -245,17 +201,32 @@ AL2O3_EXTERN_C void Image_GetPixelAt(Image_ImageHeader const *image, Image_Pixel
 	memset(pixel, 0, sizeof(Image_PixelD));
 
 	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
-			index * (TinyImageFormat_BitSizeOfPixelOrBlock(image->format) / 8);
+			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
 
-	// TinyImageFormat
-	TinyImageFormat_FetchLogicalPixel(image->format, pixelPtr, &pixel->r);
-	return;
+	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return;
 
-	// we rely on swizzle constants to fill in the channels that don't exist
-	pixel->a = Image_GetChannelAt(image, TinyImageFormat_LC_Alpha, index);
-	pixel->b = Image_GetChannelAt(image, TinyImageFormat_LC_Blue, index);
-	pixel->g = Image_GetChannelAt(image, TinyImageFormat_LC_Green, index);
-	pixel->r = Image_GetChannelAt(image, TinyImageFormat_LC_Red, index);
+	if(!TinyImageFormat_CanFetchLogicalPixels(image->format)) return;
+
+	TinyImageFormat_FetchInput input { pixelPtr };
+	TinyImageFormat_FetchLogicalPixels(image->format, &input, &pixel->r);
+}
+
+AL2O3_EXTERN_C void Image_GetBlockAt(Image_ImageHeader const *image, Image_PixelD *pixel, size_t index) {
+	ASSERT(image);
+	ASSERT(pixel);
+
+	if(!TinyImageFormat_CanFetchLogicalPixels(image->format)) return;
+
+	uint32_t pixelCount = TinyImageFormat_PixelCountOfBlock(image->format);
+
+	memset(pixel, 0, pixelCount * sizeof(Image_PixelD));
+
+	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
+			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
+
+
+	TinyImageFormat_FetchInput input { pixelPtr };
+	TinyImageFormat_FetchLogicalPixels(image->format, &input, (double *)pixel);
 }
 
 AL2O3_EXTERN_C void Image_SetPixelAt(Image_ImageHeader const *image, Image_PixelD const *pixel, size_t index) {

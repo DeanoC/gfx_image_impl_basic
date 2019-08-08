@@ -212,7 +212,7 @@ AL2O3_EXTERN_C void Image_CreateMipMapChain(Image_ImageHeader const * image, boo
 		}
 
 		curImage->nextImage = (Image_ImageHeader*)newImage;
-		curImage->nextType = Image_NT_MipMaps;
+		curImage->nextType = Image_NT_MipMap;
 		curImage = (Image_ImageHeader*)curImage->nextImage;
 	} while (curWidth > 1 || curHeight > 1);
 

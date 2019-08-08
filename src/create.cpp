@@ -96,4 +96,60 @@ AL2O3_EXTERN_C Image_ImageHeader const*Image_CreateCubemapArrayNoClear(uint32_t 
   return image;
 }
 
+AL2O3_EXTERN_C Image_ImageHeader const * Image_CreateCLUT(uint32_t width, uint32_t height, TinyImageFormat format, uint32_t clutSize) {
+	return Image_CreateCLUTArray(width, height, 1, format, clutSize);
+}
 
+AL2O3_EXTERN_C Image_ImageHeader const * Image_CreateCLUTNoClear(uint32_t width, uint32_t height, TinyImageFormat format, uint32_t clutSize) {
+	return Image_CreateCLUTArrayNoClear(width, height, 1, format, clutSize);
+}
+
+AL2O3_EXTERN_C Image_ImageHeader const * Image_CreateCLUTArray(uint32_t width,
+																															 uint32_t height,
+																															 uint32_t slices,
+																															 TinyImageFormat format,
+																															 uint32_t clutSize) {
+	if(!TinyImageFormat_IsCLUT(format)) return nullptr;
+
+	// this creates the colour image and the lut image
+	// currently LUT is always R8G8B8A8 format
+	if(slices == 0) slices = 1;
+	auto image = (Image_ImageHeader*) Image_Create(width, height, 1, slices, format);
+	if(image) {
+		auto clutImage = (Image_ImageHeader *) Image_Create(clutSize, 1, 1, 1, TinyImageFormat_R8G8B8A8_UNORM);
+		if(clutImage) {
+			image->flags = Image_Flag_CLUT;
+			image->nextType = Image_NT_CLUT;
+			image->nextImage  = clutImage;
+		} else {
+			Image_Destroy(image);
+			return nullptr;
+		}
+	}
+	return image;
+}
+AL2O3_EXTERN_C Image_ImageHeader const * Image_CreateCLUTArrayNoClear(uint32_t width,
+																																			uint32_t height,
+																																			uint32_t slices,
+																																			TinyImageFormat format,
+																																			uint32_t clutSize) {
+	if(!TinyImageFormat_IsCLUT(format)) return nullptr;
+
+	// this creates the colour image and the lut image
+	// currently LUT is always R8G8B8A8 format
+	if(slices == 0) slices = 1;
+	auto image = (Image_ImageHeader*) Image_CreateNoClear(width, height, 1, slices, format);
+	if(image) {
+		auto clutImage = (Image_ImageHeader *) Image_CreateNoClear(clutSize, 1, 1, 1, TinyImageFormat_R8G8B8A8_UNORM);
+		if(clutImage) {
+			image->flags = Image_Flag_CLUT;
+			image->nextType = Image_NT_CLUT;
+			image->nextImage  = clutImage;
+		} else {
+			Image_Destroy(image);
+			return nullptr;
+		}
+	}
+
+	return image;
+}
