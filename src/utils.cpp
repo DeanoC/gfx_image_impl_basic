@@ -13,8 +13,8 @@ AL2O3_EXTERN_C bool Image_GetColorRangeOf(Image_ImageHeader const *src, Image_Pi
 	double *minData = &omin->r;
 	double *maxData = &omax->r;
 	for (uint32_t i = 0u; i < TinyImageFormat_ChannelCount(src->format); ++i) {
-		minData[i] = TinyImageFormat_MaxAtPhysical(src->format, i);
-		maxData[i] = TinyImageFormat_MinAtPhysical(src->format, i);
+		minData[i] = TinyImageFormat_Max(src->format, (TinyImageFormat_LogicalChannel)i);
+		maxData[i] = TinyImageFormat_Min(src->format, (TinyImageFormat_LogicalChannel)i);
 	};
 
 	for (auto w = 0u; w < src->slices; ++w) {
@@ -23,7 +23,7 @@ AL2O3_EXTERN_C bool Image_GetColorRangeOf(Image_ImageHeader const *src, Image_Pi
 				for (auto x = 0u; x < src->width; ++x) {
 					size_t const index = Image_CalculateIndex(src, x, y, z, w);
 					Image_PixelD pixel;
-					Image_GetPixelAt(src, &pixel, index);
+					Image_GetPixelAtD(src, &pixel, index);
 
 					double *data = &pixel.r;
 					for (uint32_t i = 0u; i < TinyImageFormat_ChannelCount(src->format); ++i) {
@@ -109,7 +109,7 @@ AL2O3_EXTERN_C bool Image_NormalizeEachChannel(Image_ImageHeader const *src) {
 				for (auto x = 0u; x < src->width; ++x) {
 					size_t const index = Image_CalculateIndex(src, x, y, z, w);
 					Image_PixelD pixel;
-					Image_GetPixelAt(src, &pixel, index);
+					Image_GetPixelAtD(src, &pixel, index);
 					pixel.r = pixel.r * s.r + b.r;
 					pixel.g = pixel.g * s.g + b.g;
 					pixel.b = pixel.b * s.b + b.b;
@@ -137,7 +137,7 @@ AL2O3_EXTERN_C bool Image_NormalizeAcrossChannels(Image_ImageHeader const *src) 
 				for (auto x = 0u; x < src->width; ++x) {
 					size_t const index = Image_CalculateIndex(src, x, y, z, w);
 					Image_PixelD pixel;
-					Image_GetPixelAt(src, &pixel, index);
+					Image_GetPixelAtD(src, &pixel, index);
 					pixel.r = pixel.r * s + b;
 					pixel.g = pixel.g * s + b;
 					pixel.b = pixel.b * s + b;
@@ -150,7 +150,7 @@ AL2O3_EXTERN_C bool Image_NormalizeAcrossChannels(Image_ImageHeader const *src) 
 	return true;
 }
 // TODO optimise or have option for faster mipmap chain generation
-AL2O3_EXTERN_C void Image_CreateMipMapChain(Image_ImageHeader const * image, bool generateFromImage) {
+AL2O3_EXTERN_C void Image_CreateMipMapChain(Image_ImageHeader const *image, bool generateFromImage) {
 	// start from the image provided and create successive mip images
 	ASSERT(image->nextType == Image_NT_None);
 	ASSERT(Math_IsPowerOf2U32(image->width));
@@ -161,14 +161,14 @@ AL2O3_EXTERN_C void Image_CreateMipMapChain(Image_ImageHeader const * image, boo
 
 	using namespace Image;
 
-	Image_ImageHeader * curImage = (Image_ImageHeader*)image;
+	Image_ImageHeader *curImage = (Image_ImageHeader *) image;
 	uint32_t curWidth = image->width;
 	uint32_t curHeight = image->height;
 	if (curWidth <= 1 || curHeight <= 1) {
 		return;
 	}
 
-	Image_ImageHeader const * scratchImage = nullptr;
+	Image_ImageHeader const *scratchImage = nullptr;
 
 	uint32_t const numChans = TinyImageFormat_ChannelCount(image->format);
 	if (generateFromImage) {
@@ -211,9 +211,9 @@ AL2O3_EXTERN_C void Image_CreateMipMapChain(Image_ImageHeader const * image, boo
 			}
 		}
 
-		curImage->nextImage = (Image_ImageHeader*)newImage;
+		curImage->nextImage = (Image_ImageHeader *) newImage;
 		curImage->nextType = Image_NT_MipMap;
-		curImage = (Image_ImageHeader*)curImage->nextImage;
+		curImage = (Image_ImageHeader *) curImage->nextImage;
 	} while (curWidth > 1 || curHeight > 1);
 
 	if (scratchImage) {
@@ -221,14 +221,14 @@ AL2O3_EXTERN_C void Image_CreateMipMapChain(Image_ImageHeader const * image, boo
 	}
 }
 
-AL2O3_EXTERN_C void Image_CopyImageChain(Image_ImageHeader const *src, Image_ImageHeader const * dst) {
+AL2O3_EXTERN_C void Image_CopyImageChain(Image_ImageHeader const *src, Image_ImageHeader const *dst) {
 	Image_CopyImage(src, dst);
 	if (src->nextType == dst->nextType && src->nextImage && dst->nextImage) {
 		Image_CopyImageChain(src->nextImage, dst->nextImage);
 	}
 }
 
-AL2O3_EXTERN_C void Image_CopyImage(Image_ImageHeader const * src, Image_ImageHeader const * dst) {
+AL2O3_EXTERN_C void Image_CopyImage(Image_ImageHeader const *src, Image_ImageHeader const *dst) {
 	if (src == dst) {
 		return;
 	}
@@ -239,23 +239,14 @@ AL2O3_EXTERN_C void Image_CopyImage(Image_ImageHeader const * src, Image_ImageHe
 	ASSERT(dst->width == src->width);
 
 	for (auto w = 0u; w < src->slices; ++w) {
-		for (auto z = 0u; z < src->depth; ++z) {
-			for (auto y = 0u; y < src->height; ++y) {
-				for (auto x = 0u; x < src->width; ++x) {
-					size_t const index = Image_CalculateIndex(src, x, y, z, w);
-					Image_PixelD pixel;
-					Image_GetPixelAt(src, &pixel, index);
-					Image_SetPixelAt(dst, &pixel, index);
-				}
-			}
-		}
+		Image_CopySlice(src, w, dst, w);
 	}
 }
 
 AL2O3_EXTERN_C void Image_CopySlice(
-		Image_ImageHeader const * src,
+		Image_ImageHeader const *src,
 		uint32_t sw,
-		Image_ImageHeader const * dst,
+		Image_ImageHeader const *dst,
 		uint32_t dw) {
 	ASSERT(dst->depth == src->depth);
 	ASSERT(dst->height == src->height);
@@ -265,22 +256,14 @@ AL2O3_EXTERN_C void Image_CopySlice(
 	}
 
 	for (auto z = 0u; z < src->depth; ++z) {
-		for (auto y = 0u; y < src->height; ++y) {
-			for (auto x = 0u; x < src->width; ++x) {
-				size_t const srcIndex = Image_CalculateIndex(src, x, y, z, sw);
-				size_t const dstIndex = Image_CalculateIndex(src, x, y, z, dw);
-				Image_PixelD pixel;
-				Image_GetPixelAt(src, &pixel, srcIndex);
-				Image_SetPixelAt(dst, &pixel, dstIndex);
-			}
-		}
+		Image_CopyPage(src, z, sw, dst, z, dw);
 	}
 }
 
 AL2O3_EXTERN_C void Image_CopyPage(
-		Image_ImageHeader const * src,
+		Image_ImageHeader const *src,
 		uint32_t sz, uint32_t sw,
-		Image_ImageHeader const * dst,
+		Image_ImageHeader const *dst,
 		uint32_t dz, uint32_t dw) {
 	ASSERT(dst->height == src->height);
 	ASSERT(dst->width == src->width);
@@ -288,48 +271,77 @@ AL2O3_EXTERN_C void Image_CopyPage(
 		ASSERT(dz != sz || dw != sw);
 	}
 
-	for (auto y = 0u; y < src->height; ++y) {
-		for (auto x = 0u; x < src->width; ++x) {
-			size_t const srcIndex = Image_CalculateIndex(src, x, y, sz, sw);
-			size_t const dstIndex = Image_CalculateIndex(src, x, y, dz, dw);
-			Image_PixelD pixel;
-			Image_GetPixelAt(src, &pixel, srcIndex);
-			Image_SetPixelAt(dst, &pixel, dstIndex);
-		}
+	uint32_t const heightOfBlock = TinyImageFormat_HeightOfBlock(src->format);
+	for (auto y = 0u; y < src->height / heightOfBlock; ++y) {
+		Image_CopyRow(src, y, sz, sw, dst, y, dz, dw);
 	}
 }
 
-AL2O3_EXTERN_C void Image_CopyRow(Image_ImageHeader const * src,
+AL2O3_EXTERN_C void Image_CopyRow(Image_ImageHeader const *src,
 																	uint32_t sy, uint32_t sz, uint32_t sw,
-																	Image_ImageHeader const * dst,
+																	Image_ImageHeader const *dst,
 																	uint32_t dy, uint32_t dz, uint32_t dw) {
 	ASSERT(dst->width == src->width);
 	if (dst == src) {
 		ASSERT(dy != sy || dz != sz || dw != sw);
 	}
 
-	for (auto x = 0u; x < src->width; ++x) {
-		size_t const srcIndex = Image_CalculateIndex(src, x, sy, sz, sw);
-		size_t const dstIndex = Image_CalculateIndex(src, x, dy, dz, dw);
-		Image_PixelD pixel;
-		Image_GetPixelAt(src, &pixel, srcIndex);
-		Image_SetPixelAt(dst, &pixel, dstIndex);
+	// TODO replace dst CanFetchLogicalPixelsF when CanPut exist
+	// see if we can use the fast path
+	if (TinyImageFormat_CanFetchLogicalPixelsF(src->format) &&
+			TinyImageFormat_CanFetchLogicalPixelsF(dst->format)) {
+		uint32_t const widthOfBlock = TinyImageFormat_WidthOfBlock(src->format);
+		uint32_t const heightOfBlock = TinyImageFormat_HeightOfBlock(src->format);
+		uint32_t const pixelCountOfBlock = TinyImageFormat_PixelCountOfBlock(src->format);
+		uint64_t const rowBufferSize = (src->width / widthOfBlock) * pixelCountOfBlock * sizeof(float) * 4;
+
+		auto rowBuffer = (float *) STACK_ALLOC(rowBufferSize);
+
+		size_t const srcIndex = Image_CalculateIndex(src, 0, sy, sz, sw);
+		Image_GetRowAtF(src, rowBuffer, srcIndex);
+
+		// TODO replace with SetRow when done
+		for (auto x = 0u; x < src->width / widthOfBlock; ++x) {
+			uint64_t blockIndex = x * pixelCountOfBlock;
+
+			for (auto by = 0u; by < heightOfBlock; ++by) {
+				for (auto bx = 0u; bx < widthOfBlock; ++bx) {
+					size_t const dstIndex = Image_CalculateIndex(src, (x * widthOfBlock) + bx, dy + by, dz, dw);
+					Image_PixelD pixel;
+					uint64_t const rowIndex = (blockIndex + ((by * widthOfBlock) + bx)) * 4;
+					pixel.r = rowBuffer[rowIndex + 0];
+					pixel.g = rowBuffer[rowIndex + 1];
+					pixel.b = rowBuffer[rowIndex + 2];
+					pixel.a = rowBuffer[rowIndex + 3];
+					Image_SetPixelAt(dst, &pixel, dstIndex);
+				}
+			}
+		}
+	} else {
+		for (auto x = 0u; x < src->width; ++x) {
+			size_t const srcIndex = Image_CalculateIndex(src, x, sy, sz, sw);
+			size_t const dstIndex = Image_CalculateIndex(src, x, dy, dz, dw);
+			Image_PixelD pixel;
+			Image_GetPixelAtD(src, &pixel, srcIndex);
+			Image_SetPixelAt(dst, &pixel, dstIndex);
+		}
 	}
 }
 
-AL2O3_EXTERN_C void Image_CopyPixel(Image_ImageHeader const * src,
+AL2O3_EXTERN_C void Image_CopyPixel(Image_ImageHeader const *src,
 																		uint32_t sx, uint32_t sy, uint32_t sz, uint32_t sw,
-																		Image_ImageHeader const * dst,
+																		Image_ImageHeader const *dst,
 																		uint32_t dx, uint32_t dy, uint32_t dz, uint32_t dw) {
 	size_t const srcIndex = Image_CalculateIndex(src, sx, sy, sz, sw);
 	size_t const dstIndex = Image_CalculateIndex(src, dx, dy, dz, dw);
 	Image_PixelD pixel;
-	Image_GetPixelAt(src, &pixel, srcIndex);
+	Image_GetPixelAtD(src, &pixel, srcIndex);
 	Image_SetPixelAt(dst, &pixel, dstIndex);
 }
 
-AL2O3_EXTERN_C Image_ImageHeader const * Image_Clone(Image_ImageHeader const *image) {
-	auto dst = (Image_ImageHeader *) Image_Create(image->width, image->height, image->depth, image->slices, image->format);
+AL2O3_EXTERN_C Image_ImageHeader const *Image_Clone(Image_ImageHeader const *image) {
+	auto
+			dst = (Image_ImageHeader *) Image_Create(image->width, image->height, image->depth, image->slices, image->format);
 	if (dst == nullptr) {
 		return nullptr;
 	}
@@ -341,8 +353,9 @@ AL2O3_EXTERN_C Image_ImageHeader const * Image_Clone(Image_ImageHeader const *im
 	return dst;
 }
 
-AL2O3_EXTERN_C Image_ImageHeader const * Image_CloneStructure(Image_ImageHeader const * image) {
-	auto dst = (Image_ImageHeader *) Image_Create(image->width, image->height, image->depth, image->slices, image->format);
+AL2O3_EXTERN_C Image_ImageHeader const *Image_CloneStructure(Image_ImageHeader const *image) {
+	auto
+			dst = (Image_ImageHeader *) Image_Create(image->width, image->height, image->depth, image->slices, image->format);
 	if (dst == nullptr) {
 		return nullptr;
 	}
@@ -353,8 +366,9 @@ AL2O3_EXTERN_C Image_ImageHeader const * Image_CloneStructure(Image_ImageHeader 
 	return dst;
 }
 
-AL2O3_EXTERN_C Image_ImageHeader const * Image_PreciseConvert(Image_ImageHeader const * image, TinyImageFormat const newFormat) {
-	auto dst = (Image_ImageHeader *)Image_Create(image->width, image->height, image->depth, image->slices, newFormat);
+AL2O3_EXTERN_C Image_ImageHeader const *Image_PreciseConvert(Image_ImageHeader const *image,
+																														 TinyImageFormat const newFormat) {
+	auto dst = (Image_ImageHeader *) Image_Create(image->width, image->height, image->depth, image->slices, newFormat);
 	if (dst == nullptr) {
 		return nullptr;
 	}
@@ -366,11 +380,13 @@ AL2O3_EXTERN_C Image_ImageHeader const * Image_PreciseConvert(Image_ImageHeader 
 	return dst;
 }
 
-AL2O3_EXTERN_C Image_ImageHeader const* Image_PackMipmaps(Image_ImageHeader const * image) {
-	if(Image_HasPackedMipMaps(image)) return image;
+AL2O3_EXTERN_C Image_ImageHeader const *Image_PackMipmaps(Image_ImageHeader const *image) {
+	if (Image_HasPackedMipMaps(image))
+		return image;
 
 	size_t const numLevels = Image_LinkedImageCountOf(image);
-	if(numLevels == 1) return image;
+	if (numLevels == 1)
+		return image;
 
 	size_t const packedSized = Image_ByteCountOfImageChainOf(image);
 	auto *newImage = (Image_ImageHeader *) MEMORY_MALLOC(sizeof(Image_ImageHeader) + packedSized);
@@ -379,10 +395,10 @@ AL2O3_EXTERN_C Image_ImageHeader const* Image_PackMipmaps(Image_ImageHeader cons
 	newImage->flags |= Image_Flag_PackedMipMaps;
 	newImage->packedMipMapCount = numLevels;
 
-	uint8_t * dstPtr = (uint8_t*) Image_RawDataPtr(newImage);
-	for(size_t i=0;i < numLevels;++i) {
-		ASSERT(dstPtr - (uint8_t *)Image_RawDataPtr(newImage) < packedSized);
-		Image_ImageHeader const* levelHeader = Image_LinkedImageOf(image, i);
+	uint8_t *dstPtr = (uint8_t *) Image_RawDataPtr(newImage);
+	for (size_t i = 0; i < numLevels; ++i) {
+		ASSERT(dstPtr - (uint8_t *) Image_RawDataPtr(newImage) < packedSized);
+		Image_ImageHeader const *levelHeader = Image_LinkedImageOf(image, i);
 		memcpy(dstPtr, Image_RawDataPtr(levelHeader), levelHeader->dataSize);
 		dstPtr += levelHeader->dataSize;
 	}

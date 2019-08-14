@@ -194,7 +194,60 @@ AL2O3_EXTERN_C void Image_SetChannelAt(Image_ImageHeader const *image,
 
 }
 
-AL2O3_EXTERN_C void Image_GetPixelAt(Image_ImageHeader const *image, Image_PixelD *pixel, size_t index) {
+AL2O3_EXTERN_C bool Image_GetPixelAtF(Image_ImageHeader const *image, float *pixel, size_t index) {
+	ASSERT(image);
+	ASSERT(pixel);
+
+	memset(pixel, 0, sizeof(Image_PixelD));
+
+	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
+			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
+
+	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
+
+	if(!TinyImageFormat_CanFetchLogicalPixelsF(image->format)) return false;
+
+	TinyImageFormat_FetchInput input { pixelPtr };
+	return TinyImageFormat_FetchLogicalPixelsF(image->format, &input, 1, pixel);
+}
+
+AL2O3_EXTERN_C bool Image_GetBlockAtF(Image_ImageHeader const *image, float *pixels, size_t index) {
+	ASSERT(image);
+	ASSERT(pixels);
+
+	if(!TinyImageFormat_CanFetchLogicalPixelsF(image->format)) return false;
+
+	uint32_t const pixelCount = TinyImageFormat_PixelCountOfBlock(image->format);
+
+	memset(pixels, 0, pixelCount * sizeof(float) * 4);
+
+	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
+			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
+
+
+	TinyImageFormat_FetchInput input { pixelPtr };
+	return TinyImageFormat_FetchLogicalPixelsF(image->format, &input, 1, pixels);
+}
+
+AL2O3_EXTERN_C bool Image_GetRowAtF(Image_ImageHeader const *image, float *pixels, size_t index) {
+	ASSERT(image);
+	ASSERT(pixels);
+
+	if(!TinyImageFormat_CanFetchLogicalPixelsF(image->format)) return false;
+
+	uint32_t const blockWidth = TinyImageFormat_WidthOfBlock(image->format);
+
+	memset(pixels, 0, image->width * sizeof(float) * 4);
+
+	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
+			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
+
+
+	TinyImageFormat_FetchInput input { pixelPtr };
+	return TinyImageFormat_FetchLogicalPixelsF(image->format, &input, image->width / blockWidth, pixels);
+}
+
+AL2O3_EXTERN_C bool Image_GetPixelAtD(Image_ImageHeader const *image, Image_PixelD *pixel, size_t index) {
   ASSERT(image);
   ASSERT(pixel);
 
@@ -203,30 +256,30 @@ AL2O3_EXTERN_C void Image_GetPixelAt(Image_ImageHeader const *image, Image_Pixel
 	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
 			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
 
-	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return;
+	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
 
-	if(!TinyImageFormat_CanFetchLogicalPixels(image->format)) return;
+	if(!TinyImageFormat_CanFetchLogicalPixelsD(image->format)) return false;
 
 	TinyImageFormat_FetchInput input { pixelPtr };
-	TinyImageFormat_FetchLogicalPixels(image->format, &input, &pixel->r);
+	return TinyImageFormat_FetchLogicalPixelsD(image->format, &input, 1, (double*) pixel);
 }
 
-AL2O3_EXTERN_C void Image_GetBlockAt(Image_ImageHeader const *image, Image_PixelD *pixel, size_t index) {
+AL2O3_EXTERN_C bool Image_GetBlockAtD(Image_ImageHeader const *image, Image_PixelD *pixels, size_t index) {
 	ASSERT(image);
-	ASSERT(pixel);
+	ASSERT(pixels);
 
-	if(!TinyImageFormat_CanFetchLogicalPixels(image->format)) return;
+	if(!TinyImageFormat_CanFetchLogicalPixelsD(image->format)) return false;
 
 	uint32_t pixelCount = TinyImageFormat_PixelCountOfBlock(image->format);
 
-	memset(pixel, 0, pixelCount * sizeof(Image_PixelD));
+	memset(pixels, 0, pixelCount * sizeof(Image_PixelD));
 
 	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
 			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
 
 
 	TinyImageFormat_FetchInput input { pixelPtr };
-	TinyImageFormat_FetchLogicalPixels(image->format, &input, (double *)pixel);
+	return TinyImageFormat_FetchLogicalPixelsD(image->format, &input, 1, (double *)pixels);
 }
 
 AL2O3_EXTERN_C void Image_SetPixelAt(Image_ImageHeader const *image, Image_PixelD const *pixel, size_t index) {
