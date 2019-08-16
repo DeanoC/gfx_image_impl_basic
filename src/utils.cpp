@@ -1,8 +1,9 @@
 #include "al2o3_platform/platform.h"
 #include "al2o3_memory/memory.h"
-#include "tiny_imageformat/tinyimageformat.h"
+#include "tiny_imageformat/tinyimageformat_base.h"
+#include "tiny_imageformat/tinyimageformat_query.h"
+#include "tiny_imageformat/tinyimageformat_fetch.h"
 #include "gfx_image/image.h"
-#include "gfx_image/utils.h"
 #include "hq_resample.hpp"
 
 AL2O3_EXTERN_C bool Image_GetColorRangeOf(Image_ImageHeader const *src, Image_PixelD *omin, Image_PixelD *omax) {
@@ -114,7 +115,7 @@ AL2O3_EXTERN_C bool Image_NormalizeEachChannel(Image_ImageHeader const *src) {
 					pixel.g = pixel.g * s.g + b.g;
 					pixel.b = pixel.b * s.b + b.b;
 					pixel.a = pixel.a * s.a + b.a;
-					Image_SetPixelAt(src, &pixel, index);
+					Image_SetPixelAtD(src, &pixel, index);
 				}
 			}
 		}
@@ -142,7 +143,7 @@ AL2O3_EXTERN_C bool Image_NormalizeAcrossChannels(Image_ImageHeader const *src) 
 					pixel.g = pixel.g * s + b;
 					pixel.b = pixel.b * s + b;
 					pixel.a = pixel.a * s + b;
-					Image_SetPixelAt(src, &pixel, index);
+					Image_SetPixelAtD(src, &pixel, index);
 				}
 			}
 		}
@@ -313,7 +314,7 @@ AL2O3_EXTERN_C void Image_CopyRow(Image_ImageHeader const *src,
 					pixel.g = rowBuffer[rowIndex + 1];
 					pixel.b = rowBuffer[rowIndex + 2];
 					pixel.a = rowBuffer[rowIndex + 3];
-					Image_SetPixelAt(dst, &pixel, dstIndex);
+					Image_SetPixelAtD(dst, &pixel, dstIndex);
 				}
 			}
 		}
@@ -323,7 +324,7 @@ AL2O3_EXTERN_C void Image_CopyRow(Image_ImageHeader const *src,
 			size_t const dstIndex = Image_CalculateIndex(src, x, dy, dz, dw);
 			Image_PixelD pixel;
 			Image_GetPixelAtD(src, &pixel, srcIndex);
-			Image_SetPixelAt(dst, &pixel, dstIndex);
+			Image_SetPixelAtD(dst, &pixel, dstIndex);
 		}
 	}
 }
@@ -336,7 +337,7 @@ AL2O3_EXTERN_C void Image_CopyPixel(Image_ImageHeader const *src,
 	size_t const dstIndex = Image_CalculateIndex(src, dx, dy, dz, dw);
 	Image_PixelD pixel;
 	Image_GetPixelAtD(src, &pixel, srcIndex);
-	Image_SetPixelAt(dst, &pixel, dstIndex);
+	Image_SetPixelAtD(dst, &pixel, dstIndex);
 }
 
 AL2O3_EXTERN_C Image_ImageHeader const *Image_Clone(Image_ImageHeader const *image) {

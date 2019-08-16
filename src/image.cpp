@@ -1,5 +1,8 @@
 #include "al2o3_platform/platform.h"
-#include "tiny_imageformat/tinyimageformat.h"
+#include "tiny_imageformat/tinyimageformat_base.h"
+#include "tiny_imageformat/tinyimageformat_query.h"
+#include "tiny_imageformat/tinyimageformat_fetch.h"
+#include "tiny_imageformat/tinyimageformat_put.h"
 #include "gfx_image/image.h"
 #include "al2o3_memory/memory.h"
 
@@ -8,7 +11,7 @@ AL2O3_EXTERN_C Image_ImageHeader const *Image_Create(uint32_t width,
                                          uint32_t height,
                                          uint32_t depth,
                                          uint32_t slices,
-                                         enum TinyImageFormat format) {
+                                         TinyImageFormat format) {
   auto image = Image_CreateNoClear(width, height, depth, slices, format);
   if (image) {
     memset(Image_RawDataPtr(image), 0, image->dataSize);
@@ -21,7 +24,7 @@ AL2O3_EXTERN_C Image_ImageHeader const *Image_CreateNoClear(uint32_t width,
                                                 uint32_t height,
                                                 uint32_t depth,
                                                 uint32_t slices,
-                                                enum TinyImageFormat format) {
+                                                TinyImageFormat format) {
 	if(width == 0)return nullptr;
   if(height == 0) height = 1;
   if(depth == 0) depth = 1;
@@ -41,7 +44,7 @@ AL2O3_EXTERN_C void Image_FillHeader(uint32_t width,
                                uint32_t height,
                                uint32_t depth,
                                uint32_t slices,
-                               enum TinyImageFormat format,
+                               TinyImageFormat format,
                                Image_ImageHeader *header) {
 
 
@@ -77,7 +80,7 @@ AL2O3_EXTERN_C Image_ImageHeader const* Image_CreateHeaderOnly(	uint32_t width,
 																																 uint32_t height,
 																																 uint32_t depth,
 																																 uint32_t slices,
-																																 enum TinyImageFormat format) {
+																																 TinyImageFormat format) {
 	auto *image = (Image_ImageHeader *) MEMORY_MALLOC(sizeof(Image_ImageHeader));
 	if (!image) { return nullptr; }
 	Image_FillHeader(width, height, depth, slices, format, image);
@@ -282,20 +285,19 @@ AL2O3_EXTERN_C bool Image_GetBlockAtD(Image_ImageHeader const *image, Image_Pixe
 	return TinyImageFormat_FetchLogicalPixelsD(image->format, &input, 1, (double *)pixels);
 }
 
-AL2O3_EXTERN_C void Image_SetPixelAt(Image_ImageHeader const *image, Image_PixelD const *pixel, size_t index) {
-  ASSERT(image);
-  ASSERT(pixel);
+AL2O3_EXTERN_C bool Image_SetPixelAtD(Image_ImageHeader const *image, Image_PixelD const *pixel, size_t index) {
+	ASSERT(image);
+	ASSERT(pixel);
 
-  // intentional fallthrough on this switch statement
-  switch (TinyImageFormat_ChannelCount(image->format)) {
-    case 4: Image_SetChannelAt(image, TinyImageFormat_LC_Alpha, index, pixel->a);
-    case 3: Image_SetChannelAt(image, TinyImageFormat_LC_Blue, index, pixel->b);
-    case 2: Image_SetChannelAt(image, TinyImageFormat_LC_Green, index, pixel->g);
-    case 1: Image_SetChannelAt(image, TinyImageFormat_LC_Red, index, pixel->r);
-      break;
-    default:ASSERT(TinyImageFormat_ChannelCount(image->format) <= 4);
-      break;
-  }
+	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
+			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
+
+	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
+
+	if(!TinyImageFormat_CanPutLogicalPixelsF(image->format)) return false;
+
+	TinyImageFormat_PutOutput output { pixelPtr };
+	return TinyImageFormat_PutLogicalPixelsD(image->format, (double*) pixel, 1, &output);
 }
 
 AL2O3_EXTERN_C size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *image) {
