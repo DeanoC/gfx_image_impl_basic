@@ -1,6 +1,6 @@
 #include "al2o3_platform/platform.h"
 #include "gfx_image/image.h"
-#include "tiny_imageformat/tinyimageformat.h"
+#include "tiny_imageformat/tinyimageformat_base.h"
 #include "gfx_image/create.h"
 #include "al2o3_catch2/catch2.hpp"
 
@@ -12,20 +12,20 @@ TEST_CASE("Image create/destroy 1D (C)", "[Image]") {
   CHECK(image0->height == 1);
   CHECK(image0->depth == 1);
   CHECK(image0->slices == 1);
-  CHECK(image0->dataSize == (256 * TinyImageFormat_BitSizeOfPixelOrBlock(image0->format)) / 8);
+  CHECK(image0->dataSize == (256 * TinyImageFormat_BitSizeOfBlock(image0->format)) / 8);
   CHECK(image0->nextImage == nullptr);
   CHECK(image0->nextType == Image_NT_None);
   CHECK(image0->flags == 0);
   Image_Destroy(image0);
 
-  Image_ImageHeader const *image1 = Image_Create1DNoClear(64, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image1 = Image_Create1DNoClear(64, TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image1);
-  CHECK(image1->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image1->format == TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image1->width == 64);
   CHECK(image1->height == 1);
   CHECK(image1->depth == 1);
   CHECK(image1->slices == 1);
-  CHECK(image1->dataSize == (64 * TinyImageFormat_BitSizeOfPixelOrBlock((image1->format)) / 8));
+  CHECK(image1->dataSize == (64 * TinyImageFormat_BitSizeOfBlock((image1->format)) / 8));
   CHECK(image1->nextImage == nullptr);
   CHECK(image1->nextType == Image_NT_None);
   CHECK(image1->flags == 0);
@@ -38,20 +38,20 @@ TEST_CASE("Image create/destroy 1D (C)", "[Image]") {
   CHECK(image2->height == 1);
   CHECK(image2->depth == 1);
   CHECK(image2->slices == 20);
-  CHECK(image2->dataSize == (256 * 20 * TinyImageFormat_BitSizeOfPixelOrBlock((image2->format)) / 8));
+  CHECK(image2->dataSize == (256 * 20 * TinyImageFormat_BitSizeOfBlock((image2->format)) / 8));
   CHECK(image2->nextImage == nullptr);
   CHECK(image2->nextType == Image_NT_None);
   CHECK(image2->flags == 0);
   Image_Destroy(image2);
 
-  Image_ImageHeader const *image3 = Image_Create1DArrayNoClear(64, 100, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image3 = Image_Create1DArrayNoClear(64, 100, TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image3);
-  CHECK(image3->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image3->format == TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image3->width == 64);
   CHECK(image3->height == 1);
   CHECK(image3->depth == 1);
   CHECK(image3->slices == 100);
-  CHECK(image3->dataSize == (64 * 100 * TinyImageFormat_BitSizeOfPixelOrBlock(image3->format)) / 8);
+  CHECK(image3->dataSize == (64 * 100 * TinyImageFormat_BitSizeOfBlock(image3->format)) / 8);
   CHECK(image3->nextImage == nullptr);
   CHECK(image3->nextType == Image_NT_None);
   CHECK(image3->flags == 0);
@@ -67,20 +67,20 @@ TEST_CASE("Image create/destroy 2D (C)", "[Image]") {
   CHECK(image0->height == 256);
   CHECK(image0->depth == 1);
   CHECK(image0->slices == 1);
-  CHECK(image0->dataSize == (256 * 256 * TinyImageFormat_BitSizeOfPixelOrBlock(image0->format)) / 8);
+  CHECK(image0->dataSize == (256 * 256 * TinyImageFormat_BitSizeOfBlock(image0->format)) / 8);
   CHECK(image0->nextImage == nullptr);
   CHECK(image0->nextType == Image_NT_None);
   CHECK(image0->flags == 0);
   Image_Destroy(image0);
 
-  Image_ImageHeader const *image1 = Image_Create2DNoClear(64, 128, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image1 = Image_Create2DNoClear(64, 128, TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image1);
-  CHECK(image1->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image1->format == TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image1->width == 64);
   CHECK(image1->height == 128);
   CHECK(image1->depth == 1);
   CHECK(image1->slices == 1);
-  CHECK(image1->dataSize == (64 * 128 * TinyImageFormat_BitSizeOfPixelOrBlock(image1->format)) / 8);
+  CHECK(image1->dataSize == (64 * 128 * TinyImageFormat_BitSizeOfBlock(image1->format)) / 8);
   CHECK(image1->nextImage == nullptr);
   CHECK(image1->nextType == Image_NT_None);
   CHECK(image1->flags == 0);
@@ -93,20 +93,20 @@ TEST_CASE("Image create/destroy 2D (C)", "[Image]") {
   CHECK(image2->height == 256);
   CHECK(image2->depth == 1);
   CHECK(image2->slices == 20);
-  CHECK(image2->dataSize == (256 * 256 * 20 * TinyImageFormat_BitSizeOfPixelOrBlock(image2->format)) / 8);
+  CHECK(image2->dataSize == (256 * 256 * 20 * TinyImageFormat_BitSizeOfBlock(image2->format)) / 8);
   CHECK(image2->nextImage == nullptr);
   CHECK(image2->nextType == Image_NT_None);
   CHECK(image2->flags == 0);
   Image_Destroy(image2);
 
-  Image_ImageHeader const *image3 = Image_Create2DArrayNoClear(64, 32, 100, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image3 = Image_Create2DArrayNoClear(64, 32, 100, TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image3);
-  CHECK(image3->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image3->format == TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image3->width == 64);
   CHECK(image3->height == 32);
   CHECK(image3->depth == 1);
   CHECK(image3->slices == 100);
-  CHECK(image3->dataSize == (64 * 32 * 100 * TinyImageFormat_BitSizeOfPixelOrBlock(image3->format)) / 8);
+  CHECK(image3->dataSize == (64 * 32 * 100 * TinyImageFormat_BitSizeOfBlock(image3->format)) / 8);
   CHECK(image3->nextImage == nullptr);
   CHECK(image3->nextType == Image_NT_None);
   CHECK(image3->flags == 0);
@@ -121,20 +121,20 @@ TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
   CHECK(image0->height == 256);
   CHECK(image0->depth == 16);
   CHECK(image0->slices == 1);
-  CHECK(image0->dataSize == (256ULL * 256 * 16 * TinyImageFormat_BitSizeOfPixelOrBlock(image0->format)) / 8);
+  CHECK(image0->dataSize == (256ULL * 256 * 16 * TinyImageFormat_BitSizeOfBlock(image0->format)) / 8);
   CHECK(image0->nextImage == nullptr);
   CHECK(image0->nextType == Image_NT_None);
   CHECK(image0->flags == 0);
   Image_Destroy(image0);
 
-  Image_ImageHeader const *image1 = Image_Create3DNoClear(64, 128, 256, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image1 = Image_Create3DNoClear(64, 128, 256, TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image1);
-  CHECK(image1->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image1->format == TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image1->width == 64);
   CHECK(image1->height == 128);
   CHECK(image1->depth == 256);
   CHECK(image1->slices == 1);
-  CHECK(image1->dataSize == (64 * 128 * 256 * TinyImageFormat_BitSizeOfPixelOrBlock(image1->format)) / 8);
+  CHECK(image1->dataSize == (64 * 128 * 256 * TinyImageFormat_BitSizeOfBlock(image1->format)) / 8);
   CHECK(image1->nextImage == nullptr);
   CHECK(image1->nextType == Image_NT_None);
   CHECK(image1->flags == 0);
@@ -147,20 +147,20 @@ TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
   CHECK(image2->height == 256);
   CHECK(image2->depth == 256);
   CHECK(image2->slices == 20);
-  CHECK(image2->dataSize == (256ULL * 256 * 256 * 20 * TinyImageFormat_BitSizeOfPixelOrBlock(image2->format)) / 8);
+  CHECK(image2->dataSize == (256ULL * 256 * 256 * 20 * TinyImageFormat_BitSizeOfBlock(image2->format)) / 8);
   CHECK(image2->nextImage == nullptr);
   CHECK(image2->nextType == Image_NT_None);
   CHECK(image2->flags == 0);
   Image_Destroy(image2);
 
-  Image_ImageHeader const *image3 = Image_Create3DArrayNoClear(64, 32, 16, 100, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image3 = Image_Create3DArrayNoClear(64, 32, 16, 100, TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image3);
-  CHECK(image3->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image3->format == TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image3->width == 64);
   CHECK(image3->height == 32);
   CHECK(image3->depth == 16);
   CHECK(image3->slices == 100);
-  CHECK(image3->dataSize == (64 * 32 * 16 * 100 * TinyImageFormat_BitSizeOfPixelOrBlock(image3->format)) / 8);
+  CHECK(image3->dataSize == (64 * 32 * 16 * 100 * TinyImageFormat_BitSizeOfBlock(image3->format)) / 8);
   CHECK(image3->nextImage == nullptr);
   CHECK(image3->nextType == Image_NT_None);
   CHECK(image3->flags == 0);
@@ -174,7 +174,7 @@ TEST_CASE("Image create/destroy 3D (C)", "[Image]") {
   CHECK(image4->height == 1024);
   CHECK(image4->depth == 16);
   CHECK(image4->slices == 10);
-  CHECK(image4->dataSize == (1024ULL * 1024ULL * 16ULL * 10ULL * (uint64_t)TinyImageFormat_BitSizeOfPixelOrBlock(image4->format)) / 8ULL);
+  CHECK(image4->dataSize == (1024ULL * 1024ULL * 16ULL * 10ULL * (uint64_t)TinyImageFormat_BitSizeOfBlock(image4->format)) / 8ULL);
   CHECK(image4->nextImage == nullptr);
   CHECK(image4->nextType == Image_NT_None);
   CHECK(image4->flags == 0);
@@ -196,20 +196,20 @@ TEST_CASE("Image create/destroy 2D Cubemap (C)", "[Image]") {
   CHECK(image0->height == 256);
   CHECK(image0->depth == 1);
   CHECK(image0->slices == 6);
-  CHECK(image0->dataSize == (256 * 256 * 6 * TinyImageFormat_BitSizeOfPixelOrBlock(image0->format)) / 8);
+  CHECK(image0->dataSize == (256 * 256 * 6 * TinyImageFormat_BitSizeOfBlock(image0->format)) / 8);
   CHECK(image0->nextImage == nullptr);
   CHECK(image0->nextType == Image_NT_None);
   CHECK(image0->flags == Image_Flag_Cubemap);
   Image_Destroy(image0);
 
-  Image_ImageHeader const *image1 = Image_CreateCubemapNoClear(64, 128, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image1 = Image_CreateCubemapNoClear(64, 128, TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image1);
-  CHECK(image1->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image1->format == TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image1->width == 64);
   CHECK(image1->height == 128);
   CHECK(image1->depth == 1);
   CHECK(image1->slices == 6);
-  CHECK(image1->dataSize == (64 * 128 * 6 * TinyImageFormat_BitSizeOfPixelOrBlock(image1->format)) / 8);
+  CHECK(image1->dataSize == (64 * 128 * 6 * TinyImageFormat_BitSizeOfBlock(image1->format)) / 8);
   CHECK(image1->nextImage == nullptr);
   CHECK(image1->nextType == Image_NT_None);
   CHECK(image1->flags == Image_Flag_Cubemap);
@@ -222,20 +222,20 @@ TEST_CASE("Image create/destroy 2D Cubemap (C)", "[Image]") {
   CHECK(image2->height == 256);
   CHECK(image2->depth == 1);
   CHECK(image2->slices == 20 * 6);
-  CHECK(image2->dataSize == (256 * 256 * 20 * 6 * TinyImageFormat_BitSizeOfPixelOrBlock(image2->format)) / 8);
+  CHECK(image2->dataSize == (256 * 256 * 20 * 6 * TinyImageFormat_BitSizeOfBlock(image2->format)) / 8);
   CHECK(image2->nextImage == nullptr);
   CHECK(image2->nextType == Image_NT_None);
   CHECK(image2->flags == Image_Flag_Cubemap);
   Image_Destroy(image2);
 
-  Image_ImageHeader const *image3 = Image_CreateCubemapArrayNoClear(64, 32, 100, TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  Image_ImageHeader const *image3 = Image_CreateCubemapArrayNoClear(64, 32, 100, TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image3);
-  CHECK(image3->format == TinyImageFormat_R5G5B5A1_UNORM_PACK16);
+  CHECK(image3->format == TinyImageFormat_R5G5B5A1_UNORM);
   CHECK(image3->width == 64);
   CHECK(image3->height == 32);
   CHECK(image3->depth == 1);
   CHECK(image3->slices == 100 * 6);
-  CHECK(image3->dataSize == (64 * 32 * 100 * 6 * TinyImageFormat_BitSizeOfPixelOrBlock(image3->format)) / 8);
+  CHECK(image3->dataSize == (64 * 32 * 100 * 6 * TinyImageFormat_BitSizeOfBlock(image3->format)) / 8);
   CHECK(image3->nextImage == nullptr);
   CHECK(image3->nextType == Image_NT_None);
   CHECK(image3->flags == Image_Flag_Cubemap);
@@ -245,7 +245,7 @@ TEST_CASE("Image create/destroy 2D Cubemap (C)", "[Image]") {
 TEST_CASE("Calculate Index (C)", "[Image]") {
   Image_ImageHeader const *image = Image_Create3DArray(17, 17, 17, 17, TinyImageFormat_R8G8B8A8_UNORM);
   CHECK(image);
-  uint64_t const pixelSize = TinyImageFormat_BitSizeOfPixelOrBlock(image->format);
+  uint64_t const pixelSize = TinyImageFormat_BitSizeOfBlock(image->format);
   CHECK(image->dataSize == (17 * 17 * 17 * 17 * pixelSize) / 8);
 
   CHECK(pixelSize / 8 == 4);
@@ -280,7 +280,7 @@ TEST_CASE("Calculate Index (C)", "[Image]") {
   Image_Destroy(image);
 }
 
-void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, enum TinyImageFormat fmt_, bool doLog_) {
+void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, TinyImageFormat fmt_, bool doLog_) {
   using namespace Catch::literals;
   if (fmt_ == TinyImageFormat_UNDEFINED) { return; }
 
@@ -295,7 +295,7 @@ void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, enum TinyIm
   CHECK(img->depth == d_);
   CHECK(img->slices == s_);
   CHECK(img->format == fmt_);
-  uint64_t const pixelSize = TinyImageFormat_BitSizeOfPixelOrBlock(img->format);
+  uint64_t const pixelSize = TinyImageFormat_BitSizeOfBlock(img->format);
   CHECK(img->dataSize == (w_ * h_ * d_ * s_ * pixelSize) / 8);
 
   // check the image is cleared
@@ -331,7 +331,7 @@ void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, enum TinyIm
             pixel.a = mins[3] + pixel.a;
           }
 
-          Image_PixelClamp(&pixel, mins, maxs);
+          Image_PixelClampD(&pixel, mins, maxs);
 
           if (TinyImageFormat_IsNormalised(img->format)) {
             pixel.r = pixel.r / maxs[0];
@@ -346,7 +346,7 @@ void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, enum TinyIm
           }
 
           size_t const index = Image_CalculateIndex(img, x, y, z, s);
-          Image_SetPixelAt(img, &pixel, index);
+          Image_SetPixelAtD(img, &pixel, index);
         }
       }
     }
@@ -358,7 +358,7 @@ void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, enum TinyIm
           Image_PixelD pixel;
 
           size_t const index = Image_CalculateIndex(img, x, y, z, s);
-          Image_GetPixelAt(img, &pixel, index);
+          Image_GetPixelAtD(img, &pixel, index);
           if (doLog_) {
             LOGINFOF("get<RGBA> %d %d %d %d = %d %d %d %d ",
                      x, y, z, s,
@@ -372,7 +372,7 @@ void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, enum TinyIm
             expected.b = mins[2] + expected.b;
             expected.a = mins[3] + expected.a;
           }
-          Image_PixelClamp(&expected, mins, maxs);
+          Image_PixelClampD(&expected, mins, maxs);
 
           if (TinyImageFormat_IsNormalised(img->format)) {
             expected.r = expected.r / maxs[0];
@@ -482,7 +482,7 @@ IMAGE_TEST_CASE(D24_UNORM_S8_UINT, 16, 1, 1, 1, true)
 #define IF_START_MACRO
 #define IF_MOD_MACRO(x) IMAGE_TEST_CASE_FILTERED(x, 256, 4, 2, 2, false)
 #define IF_END_MACRO
-//#include "tiny_imageformat/tinyimageformat.h"
+//#include "tiny_imageformat/tinyimageformat_base.h"
 
 #endif
 

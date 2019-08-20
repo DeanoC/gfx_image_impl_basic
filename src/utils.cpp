@@ -394,11 +394,11 @@ AL2O3_EXTERN_C Image_ImageHeader const *Image_PackMipmaps(Image_ImageHeader cons
 	Image_FillHeader(image->width, image->height, image->depth, image->slices, image->format, newImage);
 	newImage->dataSize = packedSized;
 	newImage->flags |= Image_Flag_PackedMipMaps;
-	newImage->packedMipMapCount = numLevels;
+	newImage->packedMipMapCount = (uint8_t)numLevels;
 
 	uint8_t *dstPtr = (uint8_t *) Image_RawDataPtr(newImage);
 	for (size_t i = 0; i < numLevels; ++i) {
-		ASSERT(dstPtr - (uint8_t *) Image_RawDataPtr(newImage) < packedSized);
+		ASSERT((size_t)(dstPtr - (uint8_t *) Image_RawDataPtr(newImage)) < packedSized);
 		Image_ImageHeader const *levelHeader = Image_LinkedImageOf(image, i);
 		memcpy(dstPtr, Image_RawDataPtr(levelHeader), levelHeader->dataSize);
 		dstPtr += levelHeader->dataSize;
