@@ -2,7 +2,8 @@
 #include "al2o3_memory/memory.h"
 #include "tiny_imageformat/tinyimageformat_base.h"
 #include "tiny_imageformat/tinyimageformat_query.h"
-#include "tiny_imageformat/tinyimageformat_fetch.h"
+#include "tiny_imageformat/tinyimageformat_decode.h"
+#include "tiny_imageformat/tinyimageformat_encode.h"
 #include "gfx_image/image.h"
 #include "hq_resample.hpp"
 
@@ -287,10 +288,8 @@ AL2O3_EXTERN_C void Image_CopyRow(Image_ImageHeader const *src,
 		ASSERT(dy != sy || dz != sz || dw != sw);
 	}
 
-	// TODO replace dst CanFetchLogicalPixelsF when CanPut exist
-	// see if we can use the fast path
-	if (TinyImageFormat_CanFetchLogicalPixelsF(src->format) &&
-			TinyImageFormat_CanFetchLogicalPixelsF(dst->format)) {
+	if (TinyImageFormat_CanDecodeLogicalPixelsF(src->format) &&
+			TinyImageFormat_CanEncodeLogicalPixelsF(dst->format)) {
 		uint32_t const widthOfBlock = TinyImageFormat_WidthOfBlock(src->format);
 		uint32_t const heightOfBlock = TinyImageFormat_HeightOfBlock(src->format);
 		uint32_t const pixelCountOfBlock = TinyImageFormat_PixelCountOfBlock(src->format);

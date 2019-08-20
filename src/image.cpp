@@ -1,8 +1,8 @@
 #include "al2o3_platform/platform.h"
 #include "tiny_imageformat/tinyimageformat_base.h"
 #include "tiny_imageformat/tinyimageformat_query.h"
-#include "tiny_imageformat/tinyimageformat_fetch.h"
-#include "tiny_imageformat/tinyimageformat_put.h"
+#include "tiny_imageformat/tinyimageformat_decode.h"
+#include "tiny_imageformat/tinyimageformat_encode.h"
 #include "gfx_image/image.h"
 #include "al2o3_memory/memory.h"
 
@@ -208,17 +208,17 @@ AL2O3_EXTERN_C bool Image_GetPixelAtF(Image_ImageHeader const *image, float *pix
 
 	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
 
-	if(!TinyImageFormat_CanFetchLogicalPixelsF(image->format)) return false;
+	if(!TinyImageFormat_CanDecodeLogicalPixelsF(image->format)) return false;
 
 	TinyImageFormat_FetchInput input { pixelPtr };
-	return TinyImageFormat_FetchLogicalPixelsF(image->format, &input, 1, pixel);
+	return TinyImageFormat_DecodeLogicalPixelsF(image->format, &input, 1, pixel);
 }
 
 AL2O3_EXTERN_C bool Image_GetBlockAtF(Image_ImageHeader const *image, float *pixels, size_t index) {
 	ASSERT(image);
 	ASSERT(pixels);
 
-	if(!TinyImageFormat_CanFetchLogicalPixelsF(image->format)) return false;
+	if(!TinyImageFormat_CanDecodeLogicalPixelsF(image->format)) return false;
 
 	uint32_t const pixelCount = TinyImageFormat_PixelCountOfBlock(image->format);
 
@@ -229,14 +229,14 @@ AL2O3_EXTERN_C bool Image_GetBlockAtF(Image_ImageHeader const *image, float *pix
 
 
 	TinyImageFormat_FetchInput input { pixelPtr };
-	return TinyImageFormat_FetchLogicalPixelsF(image->format, &input, 1, pixels);
+	return TinyImageFormat_DecodeLogicalPixelsF(image->format, &input, 1, pixels);
 }
 
 AL2O3_EXTERN_C bool Image_GetRowAtF(Image_ImageHeader const *image, float *pixels, size_t index) {
 	ASSERT(image);
 	ASSERT(pixels);
 
-	if(!TinyImageFormat_CanFetchLogicalPixelsF(image->format)) return false;
+	if(!TinyImageFormat_CanDecodeLogicalPixelsF(image->format)) return false;
 
 	uint32_t const blockWidth = TinyImageFormat_WidthOfBlock(image->format);
 
@@ -247,7 +247,7 @@ AL2O3_EXTERN_C bool Image_GetRowAtF(Image_ImageHeader const *image, float *pixel
 
 
 	TinyImageFormat_FetchInput input { pixelPtr };
-	return TinyImageFormat_FetchLogicalPixelsF(image->format, &input, image->width / blockWidth, pixels);
+	return TinyImageFormat_DecodeLogicalPixelsF(image->format, &input, image->width / blockWidth, pixels);
 }
 
 AL2O3_EXTERN_C bool Image_GetPixelAtD(Image_ImageHeader const *image, Image_PixelD *pixel, size_t index) {
@@ -261,17 +261,17 @@ AL2O3_EXTERN_C bool Image_GetPixelAtD(Image_ImageHeader const *image, Image_Pixe
 
 	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
 
-	if(!TinyImageFormat_CanFetchLogicalPixelsD(image->format)) return false;
+	if(!TinyImageFormat_CanDecodeLogicalPixelsD(image->format)) return false;
 
 	TinyImageFormat_FetchInput input { pixelPtr };
-	return TinyImageFormat_FetchLogicalPixelsD(image->format, &input, 1, (double*) pixel);
+	return TinyImageFormat_DecodeLogicalPixelsD(image->format, &input, 1, (double*) pixel);
 }
 
 AL2O3_EXTERN_C bool Image_GetBlockAtD(Image_ImageHeader const *image, Image_PixelD *pixels, size_t index) {
 	ASSERT(image);
 	ASSERT(pixels);
 
-	if(!TinyImageFormat_CanFetchLogicalPixelsD(image->format)) return false;
+	if(!TinyImageFormat_CanDecodeLogicalPixelsD(image->format)) return false;
 
 	uint32_t pixelCount = TinyImageFormat_PixelCountOfBlock(image->format);
 
@@ -282,7 +282,7 @@ AL2O3_EXTERN_C bool Image_GetBlockAtD(Image_ImageHeader const *image, Image_Pixe
 
 
 	TinyImageFormat_FetchInput input { pixelPtr };
-	return TinyImageFormat_FetchLogicalPixelsD(image->format, &input, 1, (double *)pixels);
+	return TinyImageFormat_DecodeLogicalPixelsD(image->format, &input, 1, (double *)pixels);
 }
 
 AL2O3_EXTERN_C bool Image_SetPixelAtD(Image_ImageHeader const *image, Image_PixelD const *pixel, size_t index) {
@@ -294,10 +294,10 @@ AL2O3_EXTERN_C bool Image_SetPixelAtD(Image_ImageHeader const *image, Image_Pixe
 
 	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
 
-	if(!TinyImageFormat_CanPutLogicalPixelsF(image->format)) return false;
+	if(!TinyImageFormat_CanEncodeLogicalPixelsF(image->format)) return false;
 
 	TinyImageFormat_PutOutput output { pixelPtr };
-	return TinyImageFormat_PutLogicalPixelsD(image->format, (double*) pixel, 1, &output);
+	return TinyImageFormat_EncodeLogicalPixelsD(image->format, (double*) pixel, 1, &output);
 }
 
 AL2O3_EXTERN_C size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *image) {
