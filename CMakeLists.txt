@@ -19,10 +19,8 @@ set(Interface
 set(Src
 		convert.cpp
 		create.cpp
-		fetch.hpp
 		hq_resample.hpp
 		image.cpp
-		put.hpp
 		utils.cpp
 		)
 
