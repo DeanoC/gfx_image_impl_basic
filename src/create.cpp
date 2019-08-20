@@ -24,6 +24,7 @@ AL2O3_EXTERN_C Image_ImageHeader const *Image_CreateNoClear(uint32_t width,
 																														uint32_t slices,
 																														TinyImageFormat format) {
 	if(width == 0)return nullptr;
+	if (format == TinyImageFormat_UNDEFINED) return nullptr;
 	if(height == 0) height = 1;
 	if(depth == 0) depth = 1;
 	if(slices == 0) slices = 1;
