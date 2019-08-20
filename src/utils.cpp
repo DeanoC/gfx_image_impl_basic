@@ -24,10 +24,9 @@ AL2O3_EXTERN_C bool Image_GetColorRangeOf(Image_ImageHeader const *src, Image_Pi
 			for (auto y = 0u; y < src->height; ++y) {
 				for (auto x = 0u; x < src->width; ++x) {
 					size_t const index = Image_CalculateIndex(src, x, y, z, w);
-					Image_PixelD pixel;
-					Image_GetPixelAtD(src, &pixel, index);
+					double data[4];
+					Image_GetPixelAtD(src, data, index);
 
-					double *data = &pixel.r;
 					for (uint32_t i = 0u; i < TinyImageFormat_ChannelCount(src->format); ++i) {
 						if (data[i] < minData[i]) {
 							minData[i] = data[i];
@@ -111,12 +110,12 @@ AL2O3_EXTERN_C bool Image_NormalizeEachChannel(Image_ImageHeader const *src) {
 				for (auto x = 0u; x < src->width; ++x) {
 					size_t const index = Image_CalculateIndex(src, x, y, z, w);
 					Image_PixelD pixel;
-					Image_GetPixelAtD(src, &pixel, index);
+					Image_GetPixelAtD(src, (double*)&pixel, index);
 					pixel.r = pixel.r * s.r + b.r;
 					pixel.g = pixel.g * s.g + b.g;
 					pixel.b = pixel.b * s.b + b.b;
 					pixel.a = pixel.a * s.a + b.a;
-					Image_SetPixelAtD(src, &pixel, index);
+					Image_SetPixelAtD(src, (double const*)&pixel, index);
 				}
 			}
 		}
@@ -139,12 +138,12 @@ AL2O3_EXTERN_C bool Image_NormalizeAcrossChannels(Image_ImageHeader const *src) 
 				for (auto x = 0u; x < src->width; ++x) {
 					size_t const index = Image_CalculateIndex(src, x, y, z, w);
 					Image_PixelD pixel;
-					Image_GetPixelAtD(src, &pixel, index);
+					Image_GetPixelAtD(src, (double*)&pixel, index);
 					pixel.r = pixel.r * s + b;
 					pixel.g = pixel.g * s + b;
 					pixel.b = pixel.b * s + b;
 					pixel.a = pixel.a * s + b;
-					Image_SetPixelAtD(src, &pixel, index);
+					Image_SetPixelAtD(src, (double const*)&pixel, index);
 				}
 			}
 		}
@@ -288,43 +287,37 @@ AL2O3_EXTERN_C void Image_CopyRow(Image_ImageHeader const *src,
 		ASSERT(dy != sy || dz != sz || dw != sw);
 	}
 
+	// can we do it via the faster float path (more common case)
 	if (TinyImageFormat_CanDecodeLogicalPixelsF(src->format) &&
 			TinyImageFormat_CanEncodeLogicalPixelsF(dst->format)) {
 		uint32_t const widthOfBlock = TinyImageFormat_WidthOfBlock(src->format);
-		uint32_t const heightOfBlock = TinyImageFormat_HeightOfBlock(src->format);
 		uint32_t const pixelCountOfBlock = TinyImageFormat_PixelCountOfBlock(src->format);
 		uint64_t const rowBufferSize = (src->width / widthOfBlock) * pixelCountOfBlock * sizeof(float) * 4;
 
 		auto rowBuffer = (float *) STACK_ALLOC(rowBufferSize);
 
 		size_t const srcIndex = Image_CalculateIndex(src, 0, sy, sz, sw);
+		size_t const dstIndex = Image_CalculateIndex(dst, 0, dy, dz, dw);
 		Image_GetRowAtF(src, rowBuffer, srcIndex);
+		Image_SetRowAtF(dst, rowBuffer, dstIndex);
 
-		// TODO replace with SetRow when done
-		for (auto x = 0u; x < src->width / widthOfBlock; ++x) {
-			uint64_t blockIndex = x * pixelCountOfBlock;
+	} else if (TinyImageFormat_CanDecodeLogicalPixelsD(src->format) &&
+				TinyImageFormat_CanEncodeLogicalPixelsD(dst->format)) {
+		// this is if we require the double path
+		uint32_t const widthOfBlock = TinyImageFormat_WidthOfBlock(src->format);
+		uint32_t const pixelCountOfBlock = TinyImageFormat_PixelCountOfBlock(src->format);
+		uint64_t const rowBufferSize = (src->width / widthOfBlock) * pixelCountOfBlock * sizeof(double) * 4;
 
-			for (auto by = 0u; by < heightOfBlock; ++by) {
-				for (auto bx = 0u; bx < widthOfBlock; ++bx) {
-					size_t const dstIndex = Image_CalculateIndex(src, (x * widthOfBlock) + bx, dy + by, dz, dw);
-					Image_PixelD pixel;
-					uint64_t const rowIndex = (blockIndex + ((by * widthOfBlock) + bx)) * 4;
-					pixel.r = rowBuffer[rowIndex + 0];
-					pixel.g = rowBuffer[rowIndex + 1];
-					pixel.b = rowBuffer[rowIndex + 2];
-					pixel.a = rowBuffer[rowIndex + 3];
-					Image_SetPixelAtD(dst, &pixel, dstIndex);
-				}
-			}
-		}
+		auto rowBuffer = (double *) STACK_ALLOC(rowBufferSize);
+
+		size_t const srcIndex = Image_CalculateIndex(src, 0, sy, sz, sw);
+		size_t const dstIndex = Image_CalculateIndex(dst, 0, dy, dz, dw);
+		Image_GetRowAtD(src, rowBuffer, srcIndex);
+		Image_SetRowAtD(dst, rowBuffer, dstIndex);
 	} else {
-		for (auto x = 0u; x < src->width; ++x) {
-			size_t const srcIndex = Image_CalculateIndex(src, x, sy, sz, sw);
-			size_t const dstIndex = Image_CalculateIndex(src, x, dy, dz, dw);
-			Image_PixelD pixel;
-			Image_GetPixelAtD(src, &pixel, srcIndex);
-			Image_SetPixelAtD(dst, &pixel, dstIndex);
-		}
+		// TODO better error
+		// we can't decode and/or encode between these formats so die
+		ASSERT(false);
 	}
 }
 
@@ -335,8 +328,8 @@ AL2O3_EXTERN_C void Image_CopyPixel(Image_ImageHeader const *src,
 	size_t const srcIndex = Image_CalculateIndex(src, sx, sy, sz, sw);
 	size_t const dstIndex = Image_CalculateIndex(src, dx, dy, dz, dw);
 	Image_PixelD pixel;
-	Image_GetPixelAtD(src, &pixel, srcIndex);
-	Image_SetPixelAtD(dst, &pixel, dstIndex);
+	Image_GetPixelAtD(src, (double*)&pixel, srcIndex);
+	Image_SetPixelAtD(dst, (double*)&pixel, dstIndex);
 }
 
 AL2O3_EXTERN_C Image_ImageHeader const *Image_Clone(Image_ImageHeader const *image) {

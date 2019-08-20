@@ -52,7 +52,7 @@ AL2O3_EXTERN_C void Image_FillHeader(uint32_t width,
 	uint32_t const blockH = TinyImageFormat_HeightOfBlock(format);
 	uint32_t const blockD = TinyImageFormat_DepthOfBlock(format);
 
-	// smallest sized a block compressed texture can have is hte block size
+	// smallest sized a block texture can have is the block size
 	width = Math_MaxU32(width, blockW);
 	height = Math_MaxU32(height, blockH);
 	depth = Math_MaxU32(depth, blockD);
@@ -63,8 +63,9 @@ AL2O3_EXTERN_C void Image_FillHeader(uint32_t width,
 	depth = (depth + (blockD-1)) & ~(blockD-1);
 
 	uint64_t const pixelCount = (uint64_t)width * (uint64_t)height * (uint64_t)depth * (uint64_t)slices;
-	uint32_t const blockBitSize = TinyImageFormat_BitSizeOfBlock(format);
-	header->dataSize = (pixelCount * (uint64_t)blockBitSize) / ((uint64_t)blockW * (uint64_t)blockH * (uint64_t)blockD * 8ULL);
+	uint64_t const blockBitSize = TinyImageFormat_BitSizeOfBlock(format);
+	uint64_t const blockPixelCount = (uint64_t)blockW * (uint64_t)blockH * (uint64_t)blockD;
+	header->dataSize = (pixelCount * blockBitSize) / (blockPixelCount * 8ULL);
 
   header->width = width;
 	header->height = height;
@@ -157,25 +158,7 @@ AL2O3_EXTERN_C Image_ImageHeader const *Image_LinkedImageOf(Image_ImageHeader co
 return nullptr;
 }
 
-
-AL2O3_EXTERN_C bool Image_GetPixelAtF(Image_ImageHeader const *image, float *pixel, size_t index) {
-	ASSERT(image);
-	ASSERT(pixel);
-
-	memset(pixel, 0, sizeof(Image_PixelD));
-
-	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
-			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
-
-	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
-
-	if(!TinyImageFormat_CanDecodeLogicalPixelsF(image->format)) return false;
-
-	TinyImageFormat_FetchInput input { pixelPtr };
-	return TinyImageFormat_DecodeLogicalPixelsF(image->format, &input, 1, pixel);
-}
-
-AL2O3_EXTERN_C bool Image_GetBlockAtF(Image_ImageHeader const *image, float *pixels, size_t index) {
+AL2O3_EXTERN_C bool Image_GetBlocksAtF(Image_ImageHeader const *image, float *pixels, size_t blockCount, size_t index) {
 	ASSERT(image);
 	ASSERT(pixels);
 
@@ -190,76 +173,113 @@ AL2O3_EXTERN_C bool Image_GetBlockAtF(Image_ImageHeader const *image, float *pix
 
 
 	TinyImageFormat_FetchInput input { pixelPtr };
-	return TinyImageFormat_DecodeLogicalPixelsF(image->format, &input, 1, pixels);
+	return TinyImageFormat_DecodeLogicalPixelsF(image->format, &input, blockCount, pixels);
+}
+
+AL2O3_EXTERN_C bool Image_SetBlocksAtF(Image_ImageHeader const *image, float const *pixels, size_t blockCount, size_t index) {
+	ASSERT(image);
+	ASSERT(pixels);
+
+	if(!TinyImageFormat_CanEncodeLogicalPixelsF(image->format)) return false;
+
+	uint32_t const pixelCount = TinyImageFormat_PixelCountOfBlock(image->format);
+
+	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
+			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
+
+
+	TinyImageFormat_EncodeOutput output { pixelPtr };
+	return TinyImageFormat_EncodeLogicalPixelsF(image->format, pixels, blockCount, &output);
+}
+
+
+AL2O3_EXTERN_C bool Image_GetPixelAtF(Image_ImageHeader const *image, float *pixel, size_t index) {
+	ASSERT(image);
+	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
+	return Image_GetBlocksAtF(image, pixel, 1, index);
+}
+
+AL2O3_EXTERN_C bool Image_SetPixelAtF(Image_ImageHeader const *image, float const *pixel, size_t index) {
+	ASSERT(image);
+	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
+	return Image_SetBlocksAtF(image, pixel, 1, index);
 }
 
 AL2O3_EXTERN_C bool Image_GetRowAtF(Image_ImageHeader const *image, float *pixels, size_t index) {
 	ASSERT(image);
-	ASSERT(pixels);
-
-	if(!TinyImageFormat_CanDecodeLogicalPixelsF(image->format)) return false;
-
 	uint32_t const blockWidth = TinyImageFormat_WidthOfBlock(image->format);
 
-	memset(pixels, 0, image->width * sizeof(float) * 4);
-
-	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
-			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
-
-
-	TinyImageFormat_FetchInput input { pixelPtr };
-	return TinyImageFormat_DecodeLogicalPixelsF(image->format, &input, image->width / blockWidth, pixels);
+	return Image_GetBlocksAtF(image, pixels, image->width / blockWidth, index);
 }
 
-AL2O3_EXTERN_C bool Image_GetPixelAtD(Image_ImageHeader const *image, Image_PixelD *pixel, size_t index) {
-  ASSERT(image);
-  ASSERT(pixel);
+AL2O3_EXTERN_C bool Image_SetRowAtF(Image_ImageHeader const *image, float const *pixels, size_t index) {
+	ASSERT(image);
 
-	memset(pixel, 0, sizeof(Image_PixelD));
-
-	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
-			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
-
-	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
-
-	if(!TinyImageFormat_CanDecodeLogicalPixelsD(image->format)) return false;
-
-	TinyImageFormat_FetchInput input { pixelPtr };
-	return TinyImageFormat_DecodeLogicalPixelsD(image->format, &input, 1, (double*) pixel);
+	uint32_t const blockWidth = TinyImageFormat_WidthOfBlock(image->format);
+	return Image_SetBlocksAtF(image, pixels, image->width / blockWidth, index);
 }
 
-AL2O3_EXTERN_C bool Image_GetBlockAtD(Image_ImageHeader const *image, Image_PixelD *pixels, size_t index) {
+
+AL2O3_EXTERN_C bool Image_GetBlocksAtD(Image_ImageHeader const *image, double *pixels, size_t blockCount, size_t index) {
 	ASSERT(image);
 	ASSERT(pixels);
 
 	if(!TinyImageFormat_CanDecodeLogicalPixelsD(image->format)) return false;
 
-	uint32_t pixelCount = TinyImageFormat_PixelCountOfBlock(image->format);
+	uint32_t const pixelCount = TinyImageFormat_PixelCountOfBlock(image->format);
 
-	memset(pixels, 0, pixelCount * sizeof(Image_PixelD));
+	memset(pixels, 0, pixelCount * sizeof(float) * 4);
 
 	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
 			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
 
 
 	TinyImageFormat_FetchInput input { pixelPtr };
-	return TinyImageFormat_DecodeLogicalPixelsD(image->format, &input, 1, (double *)pixels);
+	return TinyImageFormat_DecodeLogicalPixelsD(image->format, &input, blockCount, pixels);
 }
 
-AL2O3_EXTERN_C bool Image_SetPixelAtD(Image_ImageHeader const *image, Image_PixelD const *pixel, size_t index) {
+AL2O3_EXTERN_C bool Image_SetBlocksAtD(Image_ImageHeader const *image, double const *pixels, size_t blockCount, size_t index) {
 	ASSERT(image);
-	ASSERT(pixel);
+	ASSERT(pixels);
+
+	if(!TinyImageFormat_CanEncodeLogicalPixelsD(image->format)) return false;
+
+	uint32_t const pixelCount = TinyImageFormat_PixelCountOfBlock(image->format);
 
 	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
 			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
 
-	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
 
-	if(!TinyImageFormat_CanEncodeLogicalPixelsF(image->format)) return false;
-
-	TinyImageFormat_PutOutput output { pixelPtr };
-	return TinyImageFormat_EncodeLogicalPixelsD(image->format, (double*) pixel, 1, &output);
+	TinyImageFormat_EncodeOutput output { pixelPtr };
+	return TinyImageFormat_EncodeLogicalPixelsD(image->format, pixels, blockCount, &output);
 }
+
+AL2O3_EXTERN_C bool Image_GetPixelAtD(Image_ImageHeader const *image, double *pixel, size_t index) {
+	ASSERT(image);
+	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
+	return Image_GetBlocksAtD(image, pixel, 1, index);
+}
+
+AL2O3_EXTERN_C bool Image_SetPixelAtD(Image_ImageHeader const *image, double const *pixel, size_t index) {
+	ASSERT(image);
+	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
+	return Image_SetBlocksAtD(image, pixel, 1, index);
+}
+
+AL2O3_EXTERN_C bool Image_GetRowAtD(Image_ImageHeader const *image, double *pixels, size_t index) {
+	ASSERT(image);
+	uint32_t const blockWidth = TinyImageFormat_WidthOfBlock(image->format);
+
+	return Image_GetBlocksAtD(image, pixels, image->width / blockWidth, index);
+}
+
+AL2O3_EXTERN_C bool Image_SetRowAtD(Image_ImageHeader const *image, double const *pixels, size_t index) {
+	ASSERT(image);
+
+	uint32_t const blockWidth = TinyImageFormat_WidthOfBlock(image->format);
+	return Image_SetBlocksAtD(image, pixels, image->width / blockWidth, index);
+}
+
 
 AL2O3_EXTERN_C size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *image) {
 
