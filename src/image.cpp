@@ -78,7 +78,7 @@ AL2O3_EXTERN_C bool Image_GetBlocksAtF(Image_ImageHeader const *image, float *pi
 
 
 	TinyImageFormat_FetchInput input { pixelPtr };
-	return TinyImageFormat_DecodeLogicalPixelsF(image->format, &input, blockCount, pixels);
+	return TinyImageFormat_DecodeLogicalPixelsF(image->format, &input, (uint32_t)blockCount, pixels);
 }
 
 AL2O3_EXTERN_C bool Image_SetBlocksAtF(Image_ImageHeader const *image, float const *pixels, size_t blockCount, size_t index) {
@@ -94,7 +94,7 @@ AL2O3_EXTERN_C bool Image_SetBlocksAtF(Image_ImageHeader const *image, float con
 
 
 	TinyImageFormat_EncodeOutput output { pixelPtr };
-	return TinyImageFormat_EncodeLogicalPixelsF(image->format, pixels, blockCount, &output);
+	return TinyImageFormat_EncodeLogicalPixelsF(image->format, pixels, (uint32_t)blockCount, &output);
 }
 
 
@@ -140,7 +140,7 @@ AL2O3_EXTERN_C bool Image_GetBlocksAtD(Image_ImageHeader const *image, double *p
 
 
 	TinyImageFormat_FetchInput input { pixelPtr };
-	return TinyImageFormat_DecodeLogicalPixelsD(image->format, &input, blockCount, pixels);
+	return TinyImageFormat_DecodeLogicalPixelsD(image->format, &input, (uint32_t)blockCount, pixels);
 }
 
 AL2O3_EXTERN_C bool Image_SetBlocksAtD(Image_ImageHeader const *image, double const *pixels, size_t blockCount, size_t index) {
@@ -156,7 +156,7 @@ AL2O3_EXTERN_C bool Image_SetBlocksAtD(Image_ImageHeader const *image, double co
 
 
 	TinyImageFormat_EncodeOutput output { pixelPtr };
-	return TinyImageFormat_EncodeLogicalPixelsD(image->format, pixels, blockCount, &output);
+	return TinyImageFormat_EncodeLogicalPixelsD(image->format, pixels, (uint32_t)blockCount, &output);
 }
 
 AL2O3_EXTERN_C bool Image_GetPixelAtD(Image_ImageHeader const *image, double *pixel, size_t index) {
