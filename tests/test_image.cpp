@@ -346,7 +346,7 @@ void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, TinyImageFo
           }
 
           size_t const index = Image_CalculateIndex(img, x, y, z, s);
-          Image_SetPixelAtD(img, &pixel, index);
+          Image_SetPixelAtD(img, (double const*)&pixel, index);
         }
       }
     }
@@ -358,7 +358,7 @@ void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, TinyImageFo
           Image_PixelD pixel;
 
           size_t const index = Image_CalculateIndex(img, x, y, z, s);
-          Image_GetPixelAtD(img, &pixel, index);
+          Image_GetPixelAtD(img, (double *)&pixel, index);
           if (doLog_) {
             LOGINFOF("get<RGBA> %d %d %d %d = %d %d %d %d ",
                      x, y, z, s,
