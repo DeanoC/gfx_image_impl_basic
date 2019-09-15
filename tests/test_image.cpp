@@ -286,7 +286,7 @@ void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, TinyImageFo
 
   auto img = Image_Create(w_, h_, d_, s_, fmt_);
   if (doLog_) {
-    LOGINFOF("Testing %s", TinyImageFormat_Name(fmt_));
+		LOGINFO("Testing %s", TinyImageFormat_Name(fmt_));
   }
 
   CHECK(img);
@@ -340,9 +340,9 @@ void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, TinyImageFo
             pixel.a = pixel.a / maxs[3];
           }
           if (doLog_) {
-            LOGINFOF("set<RGBA> %d %d %d %d = %d %d %d %d ",
-                     x, y, z, s,
-                     pixel.r, pixel.g, pixel.b, pixel.a);
+						LOGINFO("set<RGBA> %d %d %d %d = %d %d %d %d ",
+										x, y, z, s,
+										pixel.r, pixel.g, pixel.b, pixel.a);
           }
 
           size_t const index = Image_CalculateIndex(img, x, y, z, s);
@@ -360,9 +360,9 @@ void ImageTester(uint32_t w_, uint32_t h_, uint32_t d_, uint32_t s_, TinyImageFo
           size_t const index = Image_CalculateIndex(img, x, y, z, s);
           Image_GetPixelAtD(img, (double *)&pixel, index);
           if (doLog_) {
-            LOGINFOF("get<RGBA> %d %d %d %d = %d %d %d %d ",
-                     x, y, z, s,
-                     pixel.r, pixel.g, pixel.b, pixel.a);
+						LOGINFO("get<RGBA> %d %d %d %d = %d %d %d %d ",
+										x, y, z, s,
+										pixel.r, pixel.g, pixel.b, pixel.a);
           }
           Image_PixelD expected = {double(x), double(y), double(z), double(s)};
 
