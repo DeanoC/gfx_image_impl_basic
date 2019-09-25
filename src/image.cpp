@@ -188,19 +188,17 @@ AL2O3_EXTERN_C bool Image_SetRowAtD(Image_ImageHeader const *image, double const
 
 AL2O3_EXTERN_C size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *image) {
 
-  int const maxMipLevels =
-      Math_Log2(Math_MaxI32(image->depth,
-                            Math_MaxI32(image->width, image->height)));
-  uint32_t minWidth = TinyImageFormat_WidthOfBlock(image->format);
-  uint32_t minHeight = TinyImageFormat_HeightOfBlock(image->format);
-  uint32_t minDepth = TinyImageFormat_DepthOfBlock(image->format);
+	uint32_t const maxMipLevels =
+			Math_Log2U32(Math_MaxU32(image->depth, Math_MaxU32(image->width, image->height)));
+	uint32_t minWidth = TinyImageFormat_WidthOfBlock(image->format);
+	uint32_t minHeight = TinyImageFormat_HeightOfBlock(image->format);
+	uint32_t minDepth = TinyImageFormat_DepthOfBlock(image->format);
 
-  switch (image->format) {
-    case TinyImageFormat_PVRTC1_4BPP_UNORM:
-    case TinyImageFormat_PVRTC1_4BPP_SRGB:
+	switch (image->format) {
+		case TinyImageFormat_PVRTC1_4BPP_UNORM:
+		case TinyImageFormat_PVRTC1_4BPP_SRGB:
 		case TinyImageFormat_PVRTC2_4BPP_UNORM:
-		case TinyImageFormat_PVRTC2_4BPP_SRGB:
-    	minWidth = 8;
+		case TinyImageFormat_PVRTC2_4BPP_SRGB: minWidth = 8;
       minHeight = 8;
       break;
     case TinyImageFormat_PVRTC1_2BPP_UNORM:
